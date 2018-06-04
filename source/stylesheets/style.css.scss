@@ -1,0 +1,30 @@
+/// --- SIDEBAR ---
+$primary-color: #b40041;
+
+body {
+  background: #fcfcfc;
+}
+.image__profile {
+  height: 200px;
+  width: 200px;
+  object-fit: cover;
+  padding: 25px;
+}
+
+.icon__ruby {
+  width: 35px;
+  height: 35px;
+  fill: $primary-color;
+}
+
+.title__developer {
+  position: relative;
+  top: -10px;
+}
+
+.article {
+  padding: 25px;
+  background: white;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.05);
+}

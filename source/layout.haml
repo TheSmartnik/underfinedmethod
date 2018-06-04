@@ -1,0 +1,44 @@
+!!!
+%html
+  %head
+    %meta{content: "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{charset: "utf-8"}/
+    %meta{content: "IE=edge;chrome=1", "http-equiv" => "X-UA-Compatible"}/
+    %meta{content: "width=device-width, initial-scale=1", name: "viewport"}/
+    %title
+      Blog Title#{' - ' + current_article.title unless current_article.nil?}
+    = feed_tag :atom, "#{blog.options.prefix.to_s}/feed.xml", title: "Atom Feed"
+    = stylesheet_link_tag "https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+    = stylesheet_link_tag "stylesheets/style"
+  %body
+    .container.mt-5
+      .row
+        .col-12.col-md-3
+          = image_tag "images/profile.jpg", class: "rounded-circle mx-auto d-block image__profile"
+          .text-center
+            %h4
+              %b Nikita Misharin
+            %h5
+              .small
+                %svg.icon__ruby.text-center{viewBox: '0 0 50 50'}
+                  %use{'xlink:href' => '/images/ruby.svg#surface1'}
+                %span.title__developer
+                  Developer
+        .col-12.col-md-9
+          = yield
+
+-# %aside
+-#   %h2 Recent Articles
+-#   %ol
+-#     - blog.articles[0...10].each do |article|
+-#       %li
+-#         = link_to article.title, article
+-#         %span= article.date.strftime('%b %e')
+-#   %h2 Tags
+-#   %ol
+-#     - blog.tags.each do |tag, articles|
+-#       %li= link_to "#{tag} (#{articles.size})", tag_path(tag)
+-#   %h2 By Year
+-#   %ol
+-#     - blog.articles.group_by {|a| a.date.year }.each do |year, articles|
+-#       %li= link_to "#{year} (#{articles.size})", blog_year_path(year)
