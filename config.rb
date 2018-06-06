@@ -20,15 +20,19 @@ page '/*.txt', layout: false
 # Helpers
 ###
 
+activate :syntax
+set :markdown, tables: true, autolink: true, gh_blockcode: true, fenced_code_blocks: true, smartypants: true
+set :markdown_engine, :redcarpet
+
 activate :blog do |blog|
   # This will add a prefix to all links, template references and source paths
   # blog.prefix = "blog"
 
-  # blog.permalink = "{year}/{month}/{day}/{title}.html"
+  blog.permalink = "{title}.html"
   # Matcher for blog source files
   # blog.sources = "{year}-{month}-{day}-{title}.html"
   # blog.taglink = "tags/{tag}.html"
-  # blog.layout = "layout"
+  blog.layout = "article"
   # blog.summary_separator = /(READMORE)/
   # blog.summary_length = 250
   # blog.year_link = "{year}.html"
@@ -43,6 +47,7 @@ activate :blog do |blog|
   # blog.paginate = true
   # blog.per_page = 10
   # blog.page_link = "page/{num}"
+
 end
 
 page "/feed.xml", layout: false

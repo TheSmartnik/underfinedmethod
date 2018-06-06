@@ -1,9 +1,30 @@
 /// --- SIDEBAR ---
+@import url('https://fonts.googleapis.com/css?family=Oswald:300|Source+Sans+Pro:300');
+@import 'highlighting.css';
+
 $primary-color: #b40041;
 
 body {
   background: #fcfcfc;
+  font-family: 'Source Sans Pro', sans-serif;
+
 }
+
+ul {
+  list-style-type: none;
+}
+
+::selection {
+  background: lighten($primary-color, 10%); /* WebKit/Blink Browsers */
+}
+::-moz-selection {
+  background: lighten($primary-color, 10%); /* Gecko Browsers */
+}
+
+h1 {
+  font-family: 'Oswald', sans-serif;
+}
+
 .image__profile {
   height: 200px;
   width: 200px;
@@ -27,4 +48,36 @@ body {
   background: white;
   border: 1px solid #eee;
   box-shadow: 0 2px 3px rgba(0,0,0,0.05);
+}
+
+.article-content {
+
+  p {
+    line-height: 175%;
+    font-size: 1.25em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Oswald', sans-serif;
+    margin-bottom: 1rem;
+  }
+}
+
+.highlight {
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+a {
+  color: black;
+
+  &:visited, &:active {
+    color: black;
+  }
+
+  &:hover {
+    text-decoration: none;
+    color: darken($primary-color, 10%);
+  }
+
 }
