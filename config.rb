@@ -20,10 +20,14 @@ page '/*.txt', layout: false
 # Helpers
 ###
 
+set :build_dir, 'docs'
+
 config.social_media_links = {
   stackoverflow: 'https://stackoverflow.com/users/4308435',
   github: 'https://github.com/TheSmartnik',
 }
+
+ignore 'article.html.haml'
 
 activate :syntax
 set :markdown, tables: true, autolink: true, gh_blockcode: true, fenced_code_blocks: true, smartypants: true
@@ -44,9 +48,6 @@ activate :blog do |blog|
   # blog.month_link = "{year}/{month}.html"
   # blog.day_link = "{year}/{month}/{day}.html"
   # blog.default_extension = ".markdown"
-
-  blog.tag_template = "tag.html"
-  blog.calendar_template = "calendar.html"
 
   # Enable pagination
   # blog.paginate = true
@@ -71,7 +72,7 @@ page "/feed.xml", layout: false
 # Build-specific configuration
 configure :build do
   # Minify CSS on build
-  # activate :minify_css
+  activate :minify_css
 
   # Minify Javascript on build
   # activate :minify_javascript

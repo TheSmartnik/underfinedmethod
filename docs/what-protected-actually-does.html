@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<meta charset='utf-8'>
+<meta content='IE=edge;chrome=1' http-equiv='X-UA-Compatible'>
+<meta content='width=device-width, initial-scale=1' name='viewport'>
+<title>
+Blog Title - What protected actually does?
+</title>
+<link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/stylesheets/style.css" rel="stylesheet" />
+</head>
+<body>
+<div id='main' role='main'>
+<div class='container mt-5 mb-5'>
+<div class='row'>
+<div class='col-12 col-md-3'>
+<a href="/"><img src="/images/profile.jpg" class="rounded-circle mx-auto d-block image__profile" alt="Profile" />
+</a><div class='text-center'>
+<h4>
+<a href="/"><b>Nikita Misharin</b>
+</a></h4>
+<h5>
+<div class='small'>
+<svg class='icon__ruby text-center' viewBox='0 0 50 50'>
+<use xlink:href='/images/ruby.svg#surface1'></use>
+</svg>
+<span class='title__developer'>
+Developer
+</span>
+</div>
+<div class='mt-3'>
+Writing stuff on the internet to appear smarter, than
+<br>
+I actually am
+</div>
+</h5>
+</div>
+<div class='row mt-3'>
+<div class='col-6 text-center'>
+<a href="https://stackoverflow.com/users/4308435"><div class='icon__wrapper'>
+<img src="https://unpkg.com/simple-icons@latest/icons/stackoverflow.svg" class="icon__social" alt="Stackoverflow" />
+</div>
+</a></div>
+<div class='col-6 text-center'>
+<a href="https://github.com/TheSmartnik"><div class='icon__wrapper'>
+<img src="https://unpkg.com/simple-icons@latest/icons/github.svg" class="icon__social" alt="Github" />
+</div>
+</a></div>
+</div>
+
+</div>
+<div class='col-12 col-md-9'>
+<div class='article rounded'>
+<div class='article-content'>
+<h1 class='text-center'>What protected actually does?</h1>
+<p><code>protected</code> visibility isn’t popular, nor should it be. Having surprising and little known behaviour, that will confuse future maintainers, there are only few possible and even fewer justified use cases for it.</p>
+
+<h2>Behaviour</h2>
+
+<p><code>protected</code> methods can be explicitly called on objects, if caller is an <strong>instance</strong> of the same or descendant class .</p>
+
+<p>Here is an example with comparison of <code>public</code>, <code>protected</code> and <code>private</code> visibility modifiers.</p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="k">class</span> <span class="nc">Foo</span>
+
+  <span class="k">def</span> <span class="nf">public_method</span>
+     <span class="nb">puts</span> <span class="s1">'public'</span>
+  <span class="k">end</span>
+
+  <span class="kp">protected</span> <span class="k">def</span> <span class="nf">protected_method</span>
+    <span class="nb">puts</span> <span class="s1">'protected'</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span> <span class="k">def</span> <span class="nf">private_method</span>
+    <span class="nb">puts</span> <span class="s1">'private'</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">FooBar</span> <span class="o">&lt;</span> <span class="no">Foo</span>
+  <span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="n">foobar</span><span class="p">)</span>
+    <span class="n">foobar</span><span class="p">.</span><span class="nf">public_method</span> <span class="c1">#&gt; public</span>
+    <span class="n">foobar</span><span class="p">.</span><span class="nf">protected_method</span>  <span class="c1">#&gt; protected</span>
+    <span class="n">foobar</span><span class="p">.</span><span class="nf">private_method</span>  <span class="c1">#&gt; NoMethodError</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Baz</span>
+  <span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="n">foobar</span><span class="p">)</span>
+    <span class="n">foobar</span><span class="p">.</span><span class="nf">public_method</span> <span class="c1">#&gt; public</span>
+    <span class="n">foobar</span><span class="p">.</span><span class="nf">protected_method</span>  <span class="c1">#&gt; NoMethodError</span>
+    <span class="n">foobar</span><span class="p">.</span><span class="nf">private_method</span>  <span class="c1">#&gt; NoMethodError</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>As you can see from example above, <code>public</code> can be called from anywhere. <code>protected</code> from and instance of the same or descendant class .  And <code>private</code> can’t be called on instance  at all.</p>
+
+<h3>respond_to?</h3>
+
+<p>One important thing  to note.
+<code>respond_to?</code> doesn’t include protected and private methods in search. You should pass second boolean argument to enable this feature.</p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="k">class</span> <span class="nc">FooBar</span> <span class="o">&lt;</span> <span class="no">Foo</span>
+  <span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="n">foobar</span><span class="p">)</span>
+    <span class="nb">puts</span> <span class="n">foobar</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:protected_method</span><span class="p">)</span> <span class="c1">#&gt; false</span>
+    <span class="nb">puts</span> <span class="n">foobar</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:protected_method</span><span class="p">)</span> <span class="c1">#&gt; true</span>
+    <span class="n">foobar</span><span class="p">.</span><span class="nf">protected_method</span> <span class="c1">#&gt; protected</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+<h2>In the wild</h2>
+
+<h3>Huginn. The good.</h3>
+
+<p>Other design choices aside. The following snippet is a simplified extract from <a href="https://github.com/huginn/huginn/blob/master/lib/location.rb">Huginn source code</a>. And <code>protected</code> here is a rare example of correct usage.</p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="k">class</span> <span class="nc">Location</span> <span class="o">&lt;</span> <span class="no">Struct</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:latitude</span><span class="p">,</span> <span class="ss">:longitude</span><span class="p">)</span>
+  <span class="kp">protected</span> <span class="ss">:[]=</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="p">[])</span>
+    <span class="k">super</span><span class="p">()</span>
+
+    <span class="nb">self</span><span class="p">.</span><span class="nf">latitude</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span> <span class="nf">longitude</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="n">data</span><span class="p">.</span><span class="nf">size</span> <span class="o">==</span> <span class="mi">2</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">latitude</span><span class="o">=</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="nb">self</span><span class="p">[</span><span class="ss">:latitude</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span> <span class="k">if</span> <span class="n">value</span><span class="p">.</span><span class="nf">abs</span> <span class="o">&lt;=</span> <span class="mi">90</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">longitude</span><span class="o">=</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="nb">self</span><span class="p">[</span><span class="ss">:longitude</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span> <span class="k">if</span> <span class="n">value</span><span class="p">.</span><span class="nf">abs</span> <span class="o">&lt;=</span> <span class="mi">180</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>Struct descendant’s can assign variables both through <code>[]=</code> method and through explicit setters. Here, as you can see, <code>[]=</code> is protected to prevent assigning instance attributes with anything, but redefined setters.</p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="n">location</span> <span class="o">=</span> <span class="no">Location</span><span class="p">.</span><span class="nf">new</span>
+<span class="o">=&gt;</span> <span class="c1">#&lt;struct Location latitude=nil, longitude=nil&gt;</span>
+
+<span class="n">location</span><span class="p">.</span><span class="nf">latitude</span> <span class="o">=</span> <span class="mf">53.1242</span>
+<span class="o">=&gt;</span> <span class="mf">53.1242</span>
+
+<span class="n">location</span><span class="p">[</span><span class="ss">:longitude</span><span class="p">]</span> <span class="o">=</span> <span class="mf">42.2124</span>
+<span class="no">NoMethodError</span><span class="p">:</span> <span class="kp">protected</span> <span class="nb">method</span> <span class="sb">`[]=' called for #&lt;struct Location latitude=53.1242, longitude=nil&gt;
+</span></code></pre></div>
+<h3>Grape &amp; Devise. The Bad</h3>
+
+<h4>Grape</h4>
+
+<p>Let’s look at an example use of <code>protected</code>  in a simple coercion class. I’ll provide code, without comments, full source code <a href="https://github.com/ruby-grape/grape/blob/220c345dff9602e431ac780abcb98dbb24293395/lib/grape/validations/types/json.rb#L33-L41">here</a></p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="k">module</span> <span class="nn">Grape</span>
+  <span class="k">module</span> <span class="nn">Validations</span>
+    <span class="k">module</span> <span class="nn">Types</span>
+      <span class="k">class</span> <span class="nc">Json</span> <span class="o">&lt;</span> <span class="no">Virtus</span><span class="o">::</span><span class="no">Attribute</span>
+        <span class="k">def</span> <span class="nf">coerce</span><span class="p">(</span><span class="n">input</span><span class="p">)</span>
+          <span class="k">return</span> <span class="k">if</span> <span class="n">input</span><span class="p">.</span><span class="nf">nil?</span> <span class="o">||</span> <span class="n">input</span> <span class="o">=~</span> <span class="sr">/^\\s*$/</span>
+          <span class="no">JSON</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="ss">symbolize_names: </span><span class="kp">true</span><span class="p">)</span>
+        <span class="k">end</span>
+
+        <span class="k">def</span> <span class="nf">value_coerced?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+          <span class="n">value</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="o">::</span><span class="no">Hash</span><span class="p">)</span> <span class="o">||</span> <span class="n">coerced_collection?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">end</span>
+
+        <span class="kp">protected</span>
+
+        <span class="k">def</span> <span class="nf">coerced_collection?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+          <span class="n">value</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="o">::</span><span class="no">Array</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">.</span><span class="nf">all?</span> <span class="p">{</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span> <span class="n">i</span><span class="p">.</span><span class="nf">is_a?</span> <span class="o">::</span><span class="no">Hash</span> <span class="p">}</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="k">class</span> <span class="nc">JsonArray</span> <span class="o">&lt;</span> <span class="no">Json</span>
+
+        <span class="k">def</span> <span class="nf">coerce</span><span class="p">(</span><span class="n">input</span><span class="p">)</span>
+          <span class="n">json</span> <span class="o">=</span> <span class="k">super</span>
+          <span class="no">Array</span><span class="p">.</span><span class="nf">wrap</span><span class="p">(</span><span class="n">json</span><span class="p">)</span> <span class="k">unless</span> <span class="n">json</span><span class="p">.</span><span class="nf">nil?</span>
+        <span class="k">end</span>
+
+        <span class="k">def</span> <span class="nf">value_coerced?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+          <span class="n">coerced_collection?</span> <span class="n">value</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>Here you can see an example of very common misconception that <code>private</code>  methods can’t be called inside child classes and  <code>protected</code>  methods should be called instead  <em>(As in Java</em>C)/. It is wrong.  You don’t need  <code>protected</code>  here, If we replace it with <code>private</code> the code will work just fine. And it would be better, because it will be less confusing for a reader.</p>
+
+<h4>Devise</h4>
+
+<p>Repeats the same mistake Grape does. It uses <code>protected</code>  in modules, that are intended be included in user generated models and controllers. So, <code>protected</code> in this case can be replaced with  <code>private</code> as those methods are never called on instance</p>
+
+<h3>Rails. The Ugly</h3>
+
+<p>First, in <code>ActionDispatch::Routing::UrlFor</code>  module we define a protected method <code>optimize_routes_generation?</code></p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="kp">protected</span>
+
+<span class="k">def</span> <span class="nf">optimize_routes_generation?</span>
+  <span class="n">_routes</span><span class="p">.</span><span class="nf">optimize_routes_generation?</span> <span class="o">&amp;&amp;</span> <span class="n">default_url_options</span><span class="p">.</span><span class="nf">empty?</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>And then later in code call it via <code>send</code>  from <code>ActionDispatch::Routing::RouteSet::NamedRouteCollection::UrlHelper::OptimizedUrlHelper</code></p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="k">def</span> <span class="nf">optimize_routes_generation?</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+  <span class="n">t</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:optimize_routes_generation?</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>The main point, of <code>protected</code> is to allow instances of the same and descendant classes to call interior methods, that no one else outside have no need to know about.  If some outside instance needs to call <code>protected</code> method, just leave it <code>public</code></p>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
