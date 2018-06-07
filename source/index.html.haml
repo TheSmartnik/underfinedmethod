@@ -1,6 +1,7 @@
 %ul
   - blog.articles.each do |article|
-    %li.article.rounded
-      %h1= link_to article.title, article
-      %h4= article.metadata[:page][:desc]
-      .small= article.tags.join(" #")
+    = link_to article do
+      %li.article.rounded
+        %h1= article.title
+        %h4.black= article.metadata[:page][:desc]
+        / .small= article.tags.join(" #")

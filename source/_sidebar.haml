@@ -1,0 +1,23 @@
+= link_to '/' do
+  = image_tag "images/profile.jpg", class: "rounded-circle mx-auto d-block image__profile"
+.text-center
+  %h4
+    = link_to '/' do
+      %b Nikita Misharin
+  %h5
+    .small
+      %svg.icon__ruby.text-center{viewBox: '0 0 50 50'}
+        %use{'xlink:href' => '/images/ruby.svg#surface1'}
+      %span.title__developer
+        Developer
+    .mt-3
+      Writing stuff on the internet to appear smarter, than
+      %br
+      I actually am
+
+.row.mt-3
+  - config.social_media_links.each do |name, src|
+    .col-6.text-center
+      = link_to src do
+        .icon__wrapper
+          = image_tag "https://unpkg.com/simple-icons@latest/icons/#{name}.svg", class: 'icon__social'

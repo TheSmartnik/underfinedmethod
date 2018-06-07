@@ -20,6 +20,11 @@ page '/*.txt', layout: false
 # Helpers
 ###
 
+config.social_media_links = {
+  stackoverflow: 'https://stackoverflow.com/users/4308435',
+  github: 'https://github.com/TheSmartnik',
+}
+
 activate :syntax
 set :markdown, tables: true, autolink: true, gh_blockcode: true, fenced_code_blocks: true, smartypants: true
 set :markdown_engine, :redcarpet
