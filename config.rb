@@ -25,6 +25,8 @@ set :build_dir, 'docs'
 activate :relative_assets
 set :relative_links, true
 
+config.domain = 'underfinedmethod.com'
+
 config.social_media_links = {
   stackoverflow: 'https://stackoverflow.com/users/4308435',
   github: 'https://github.com/TheSmartnik',
