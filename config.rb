@@ -25,7 +25,7 @@ set :build_dir, 'docs'
 activate :relative_assets
 set :relative_links, true
 
-config.domain = 'underfinedmethod.com'
+config.domain = 'thesmartnik.com'
 
 config.social_media_links = {
   stackoverflow: 'https://stackoverflow.com/users/4308435',
@@ -44,7 +44,7 @@ activate :blog do |blog|
 
   blog.permalink = "{title}.html"
   # Matcher for blog source files
-  # blog.sources = "{year}-{month}-{day}-{title}.html"
+  blog.sources = "posts/{title}.html"
   # blog.taglink = "tags/{tag}.html"
   blog.layout = "article"
   # blog.summary_separator = /(READMORE)/

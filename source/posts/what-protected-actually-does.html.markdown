@@ -1,10 +1,13 @@
 ---
+
 title: What protected actually does?
+date: 2017-11-25 14:11 UTC
 desc: Being famillar with C-family languages, you may be surprised to know how protected works in Ruby
 tags:
   - ruby
   - middleman
   - static site generation
+
 ---
 
  `protected` visibility isn’t popular, nor should it be. Having surprising and little known behaviour, that will confuse future maintainers, there are only few possible and even fewer justified use cases for it.

@@ -1,22 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Blog Name</title>
-  <subtitle>Blog subtitle</subtitle>
-  <id>http://blog.url.com/</id>
-  <link href="http://blog.url.com/"/>
-  <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2012-01-01T04:00:00+04:00</updated>
+  <title>Nikita Misharin's blog</title>
+  <subtitle>Write-only tech blog</subtitle>
+  <id>https://thesmartnik.com/</id>
+  <link href="https://thesmartnik.com/"/>
+  <link href="https://thesmartnik.com/feed.xml" rel="self"/>
+  <updated>2018-06-14T17:11:00+03:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
   <entry>
-    <title>What protected actually does?</title>
-    <link rel="alternate" href="http://blog.url.com/what-protected-actually-does.html"/>
-    <id>http://blog.url.com/what-protected-actually-does.html</id>
-    <published>2012-01-01T04:00:00+04:00</published>
-    <updated>2018-06-06T04:24:50+03:00</updated>
+    <title>Generating pdf with wickedpdf in sidekiq</title>
+    <link rel="alternate" href="https://thesmartnik.com/generating-pdf-with-wickedpdf-in-sidekiq.html"/>
+    <id>https://thesmartnik.com/generating-pdf-with-wickedpdf-in-sidekiq.html</id>
+    <published>2018-06-14T17:11:00+03:00</published>
+    <updated>2018-06-14T17:34:55+03:00</updated>
     <author>
-      <name>Article Author</name>
+      <name>Mikita Misharin</name>
+    </author>
+    <content type="html">&lt;p&gt;Recently, I had to generate invoice pdf in a background job.
+There is a &lt;a href="https://github.com/mileszs/wicked_pdf/wiki/Background-PDF-creation-via-delayed_job-gem"&gt;documentation&lt;/a&gt; for how to do so, but it seemes overly complicated.&lt;/p&gt;
+
+&lt;p&gt;Here is a shorter, more readable version and without unnecessary &lt;code&gt;class_eval&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="n"&gt;view&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;ActionView&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Base&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;new&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'app/views/resources/'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{},&lt;/span&gt; &lt;span class="no"&gt;ActionController&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Base&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;new&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;html&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;view&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;render&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;file: &lt;/span&gt;&lt;span class="s1"&gt;'show.html.slim'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;locals: &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="ss"&gt;resource: &lt;/span&gt;&lt;span class="n"&gt;resource&lt;/span&gt; &lt;span class="p"&gt;})&lt;/span&gt;
+
+&lt;span class="no"&gt;WickedPdf&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;new&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;pdf_from_string&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;html&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Returned pdf you can then &lt;strong&gt;upload to S3&lt;/strong&gt; or **store in a file.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>What protected actually does?</title>
+    <link rel="alternate" href="https://thesmartnik.com/what-protected-actually-does.html"/>
+    <id>https://thesmartnik.com/what-protected-actually-does.html</id>
+    <published>2017-11-25T17:11:00+03:00</published>
+    <updated>2018-06-14T17:31:43+03:00</updated>
+    <author>
+      <name>Mikita Misharin</name>
     </author>
     <content type="html">&lt;p&gt;&lt;code&gt;protected&lt;/code&gt; visibility isn’t popular, nor should it be. Having surprising and little known behaviour, that will confuse future maintainers, there are only few possible and even fewer justified use cases for it.&lt;/p&gt;
 
