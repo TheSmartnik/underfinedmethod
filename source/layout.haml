@@ -12,13 +12,8 @@
     = stylesheet_link_tag "stylesheets/style"
   %body
     #main{:role => "main"}
-      .container.mt-5.mb-5
-        .row
-          .col-12.col-md-3.mb-5
-            = partial 'sidebar'
-
-          .col-12.col-md-9
-            = yield
+      = partial 'grid' do
+        = yield
 
 -# %aside
 -#   %h2 Recent Articles
