@@ -2,7 +2,7 @@
 
 title: ActiveJob In Retrospect
 date: 2018-07-12 14:11 UTC
-desc: ActiveJob's been around for almost 4 years now. But was it a good idea in the first place?
+desc: ActiveJob has been around for almost 4 years now. But was it a good idea in the first place?
 tags:
 
 ---
