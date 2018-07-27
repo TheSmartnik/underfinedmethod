@@ -1,8 +1,8 @@
 ---
 
-title: ActiveJob
+title: ActiveJob In Retrospect
 date: 2018-07-12 14:11 UTC
-desc:
+desc: ActiveJob's been around for almost 4 years now. But was it a good idea in the first place?
 tags:
 
 ---
@@ -11,7 +11,48 @@ Recently, I replaced `ActiveJob` with `Resque` _(why it's resque and not sidekiq
 
 Creating `ActiveRecord` was a very reasonable thing to do. It's enough to look at connection adapters for [postgres](https://github.com/rails/rails/blob/master/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb) and [mysql](https://github.com/rails/rails/blob/master/activerecord/lib/active_record/connection_adapters/mysql/database_statements.rb) to see why. Lots of methods, quite different implementation. Hard to remember. Hard to switch to projects, where a database is not the one you're used to. And of course, it gives an ability to switch databases without changing code (unless you use db specific features as most of us do)
 
-Now let's look at ActiveJob's adapters: [Sidekiq](https://github.com/rails/rails/blob/master/activejob/lib/active_job/queue_adapters/sidekiq_adapter.rb), [Resque](https://github.com/rails/rails/blob/master/activejob/lib/active_job/queue_adapters/resque_adapter.rb). Two methods, two! Do we really need an abstraction layer for just two methods? Or better rephrased, do we really need an abstraction layer that prevents us from using [features](https://github.com/lantins/resque-retry/issues/140) without monkey patching _(not to say it's absolute evil, but it rather error prone)_ or adds unnecessary [performance overhead](https://github.com/mperham/sidekiq/wiki/Active-Job#performance)?
+Now let's look at ActiveJob's adapters.
+
+#### Sidekiq
+
+```ruby
+class SidekiqAdapter
+  def enqueue(job) #:nodoc:
+    job.provider_job_id = Sidekiq::Client.push(
+      "class" => JobWrapper, "wrapped" => job.class.to_s,
+      "queue" => job.queue_name, "args" => [ job.serialize ]
+    )
+  end
+
+  def enqueue_at(job, timestamp) #:nodoc:
+    job.provider_job_id = Sidekiq::Client.push(
+      "class" => JobWrapper, "wrapped" => job.class.to_s, "queue" => job.queue_name,
+      "args" => [ job.serialize ],"at" => timestamp
+    )
+  end
+end
+```
+
+#### Resque
+
+```ruby
+    class ResqueAdapter
+      def enqueue(job) #:nodoc:
+        JobWrapper.instance_variable_set(:@queue, job.queue_name)
+        Resque.enqueue_to job.queue_name, JobWrapper, job.serialize
+      end
+
+      def enqueue_at(job, timestamp) #:nodoc:
+        unless Resque.respond_to?(:enqueue_at_with_queue)
+          raise NotImplementedError, "To be able to schedule jobs with Resque you need the " \
+            "resque-scheduler gem. Please add it to your Gemfile and run bundle install"
+        end
+        Resque.enqueue_at_with_queue job.queue_name, timestamp, JobWrapper, job.serialize
+```
+
+And that's it, just two methods. Do we really need an abstraction layer for just two methods? Sometimes yes, but do we really need an abstraction layer that prevents us from using [features](https://github.com/lantins/resque-retry/issues/140) without monkey patching _(not to say it's absolute evil, but it rather error prone)_ or adds unnecessary [performance overhead](https://github.com/mperham/sidekiq/wiki/Active-Job#performance)?
+
+---
 
 Rails is very good at tools that, provided out of the box, just work. Minimum if any configuration and you all set. However setting up any background job framework is simple. Just five lines of code for sidekiq and a little more for resque.
 
