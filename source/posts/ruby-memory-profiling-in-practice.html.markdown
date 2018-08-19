@@ -1,7 +1,7 @@
 ---
 
 title: Ruby Memory Profiling in Practice
-desc: A recent task at work insipired me to write a guide I was trying to find for a long time.
+desc: A recent task at work inspired me to write a guide I was trying to find for a long time.
 date: 2018-08-19 14:09 UTC
 tags: 
 
