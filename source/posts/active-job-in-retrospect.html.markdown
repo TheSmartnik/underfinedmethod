@@ -70,6 +70,4 @@ Rails is very good at tools that, provided out of the box, just work. Minimum if
 
 Other feature that `ActiveJob` provides is ability to change background processing backend  with one line of code. Although, I think it's a rare use case. I used it once to switch from resque to sidekiq to resque again. And it wasn't one line of code. With `ActiveJob` the only thing I avoided is a few global 'Find And Replace' over the codebase.
 
-When something is default and works out of the box, there is a lot of inner resistance in replacing it. `ActiveJob` brings little agility, gives another _default_ interface to learn how to work with and how to test properly. It also adds possibility that some external gems won't work and you would have to some how monkey patch this gem to make it work or get rid of `ActiveJob` all together.
-
-All this and not much profit in return.
+When something is default and works out of the box, there is a lot of inner resistance in replacing it. `ActiveJob` brings little agility, gives another _default_ interface to learn how to work with and how to test properly. It also adds possibility that some external gems won't work and you would have to some how monkey patch this gem to make it work or get rid of `ActiveJob` all together.All this and not much profit in return.

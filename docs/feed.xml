@@ -10,17 +10,17 @@
     <name>Blog Author</name>
   </author>
   <entry>
-    <title>Newcomers guide to profiling memory in Ruby</title>
-    <link rel="alternate" href="https://thesmartnik.com/newcomers-guide-to-memory-profiling-in-ruby.html"/>
-    <id>https://thesmartnik.com/newcomers-guide-to-memory-profiling-in-ruby.html</id>
+    <title>Ruby Memory Profiling in Practice</title>
+    <link rel="alternate" href="https://thesmartnik.com/ruby-memory-profiling-in-practice.html"/>
+    <id>https://thesmartnik.com/ruby-memory-profiling-in-practice.html</id>
     <published>2018-08-19T19:09:00+05:00</published>
-    <updated>2018-08-19T23:48:00+05:00</updated>
+    <updated>2018-08-20T00:53:17+05:00</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
     <content type="html">&lt;p&gt;When I only started programming, I loved tasks related to profiling and optimization.
 However, my knowledge on this subject was very limited and I desparately searched for articles with some tips and tricks on how to profile properly.
-I thought there were some secrets or techniques, that I should know to profile properly. A few years forward, I can say there a none, really 🤷‍♂️.&lt;/p&gt;
+I thought there were some secrets or techniques, that I should know. A few years forward, I can say there a none, really 🤷‍♂️.&lt;/p&gt;
 
 &lt;p&gt;But here is some tips to give you confidence.&lt;/p&gt;
 
@@ -65,25 +65,15 @@ I thought there were some secrets or techniques, that I should know to profile p
 &lt;h4&gt;Middleman&lt;/h4&gt;
 
 &lt;p&gt;Middleman created extra array each time I ignored the object.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Before&lt;/strong&gt;&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="n"&gt;resources&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;map&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
-  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;ignored?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;normalized_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ignore!&lt;/span&gt;
-  &lt;span class="k"&gt;elsif&lt;/span&gt; &lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;is_a?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;ProxyResource&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;file_descriptor&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;ignored?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;file_descriptor&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;normalized_relative_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ignore!&lt;/span&gt;
-  &lt;span class="k"&gt;end&lt;/span&gt;
-  &lt;span class="n"&gt;r&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;After&lt;/strong&gt;&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="n"&gt;resources&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
-  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;ignored?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;normalized_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ignore!&lt;/span&gt;
-  &lt;span class="k"&gt;elsif&lt;/span&gt; &lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;is_a?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;ProxyResource&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;file_descriptor&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;ignored?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;file_descriptor&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;normalized_relative_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ignore!&lt;/span&gt;
-  &lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight diff"&gt;&lt;code&gt;&lt;span class="gd"&gt;- resources.map do |r|
+&lt;/span&gt;&lt;span class="gi"&gt;+ resources.each do |r|
+&lt;/span&gt;  if ignored?(r.normalized_path)
+    r.ignore!
+  elsif !r.is_a?(ProxyResource) &amp;amp;&amp;amp; r.file_descriptor &amp;amp;&amp;amp; ignored?(r.file_descriptor.normalized_relative_path)
+    r.ignore!
+  end
+&lt;span class="gd"&gt;-  r
+&lt;/span&gt;end
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Seems like a very small thing. However, I had thousands of ignored objects. And those little arrays accounted for 10% of memory used during initialization.
 Here is &lt;a href="https://github.com/middleman/middleman/pull/2183"&gt;a link to pr&lt;/a&gt;.&lt;/p&gt;
@@ -136,7 +126,7 @@ Here is &lt;a href="https://github.com/middleman/middleman/pull/2183"&gt;a link 
     <link rel="alternate" href="https://thesmartnik.com/active-job-in-retrospect.html"/>
     <id>https://thesmartnik.com/active-job-in-retrospect.html</id>
     <published>2018-07-12T19:11:00+05:00</published>
-    <updated>2018-08-19T23:53:33+05:00</updated>
+    <updated>2018-08-20T00:39:06+05:00</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
@@ -195,9 +185,7 @@ Here is &lt;a href="https://github.com/middleman/middleman/pull/2183"&gt;a link 
 
 &lt;p&gt;Other feature that &lt;code&gt;ActiveJob&lt;/code&gt; provides is ability to change background processing backend  with one line of code. Although, I think it&amp;rsquo;s a rare use case. I used it once to switch from resque to sidekiq to resque again. And it wasn&amp;rsquo;t one line of code. With &lt;code&gt;ActiveJob&lt;/code&gt; the only thing I avoided is a few global &amp;lsquo;Find And Replace&amp;rsquo; over the codebase.&lt;/p&gt;
 
-&lt;p&gt;When something is default and works out of the box, there is a lot of inner resistance in replacing it. &lt;code&gt;ActiveJob&lt;/code&gt; brings little agility, gives another &lt;em&gt;default&lt;/em&gt; interface to learn how to work with and how to test properly. It also adds possibility that some external gems won&amp;rsquo;t work and you would have to some how monkey patch this gem to make it work or get rid of &lt;code&gt;ActiveJob&lt;/code&gt; all together.&lt;/p&gt;
-
-&lt;p&gt;All this and not much profit in return.&lt;/p&gt;
+&lt;p&gt;When something is default and works out of the box, there is a lot of inner resistance in replacing it. &lt;code&gt;ActiveJob&lt;/code&gt; brings little agility, gives another &lt;em&gt;default&lt;/em&gt; interface to learn how to work with and how to test properly. It also adds possibility that some external gems won&amp;rsquo;t work and you would have to some how monkey patch this gem to make it work or get rid of &lt;code&gt;ActiveJob&lt;/code&gt; all together.All this and not much profit in return.&lt;/p&gt;
 </content>
   </entry>
   <entry>

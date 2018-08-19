@@ -1,6 +1,6 @@
 ---
 
-title: Newcomers guide to profiling memory in Ruby
+title: Ruby Memory Profiling in Practice
 desc: A recent task at work insipired me to write a guide I was trying to find for a long time.
 date: 2018-08-19 14:09 UTC
 tags: 
@@ -9,7 +9,7 @@ tags:
 
 When I only started programming, I loved tasks related to profiling and optimization.
 However, my knowledge on this subject was very limited and I desparately searched for articles with some tips and tricks on how to profile properly.
-I thought there were some secrets or techniques, that I should know to profile properly. A few years forward, I can say there a none, really 🤷‍♂️.
+I thought there were some secrets or techniques, that I should know. A few years forward, I can say there a none, really 🤷‍♂️.
 
 But here is some tips to give you confidence.
 
@@ -58,28 +58,15 @@ Here is a couple examples to illustrate what I mean. I recently had a problem wi
 
 Middleman created extra array each time I ignored the object.
 
-**Before**
-
-```ruby
-resources.map do |r|
+```diff
+- resources.map do |r|
++ resources.each do |r|
   if ignored?(r.normalized_path)
     r.ignore!
   elsif !r.is_a?(ProxyResource) && r.file_descriptor && ignored?(r.file_descriptor.normalized_relative_path)
     r.ignore!
   end
-  r
-end
-```
-
-**After**
-
-```ruby
-resources.each do |r|
-  if ignored?(r.normalized_path)
-    r.ignore!
-  elsif !r.is_a?(ProxyResource) && r.file_descriptor && ignored?(r.file_descriptor.normalized_relative_path)
-    r.ignore!
-  end
+-  r
 end
 ```
 
