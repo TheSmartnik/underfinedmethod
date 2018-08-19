@@ -96,6 +96,7 @@ a {
 
   &:hover {
     color: darken($primary-color, 10%);
+    text-decoration: none;
   }
 
 }
