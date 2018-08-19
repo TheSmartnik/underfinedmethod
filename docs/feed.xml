@@ -5,16 +5,144 @@
   <id>https://thesmartnik.com/</id>
   <link href="https://thesmartnik.com/"/>
   <link href="https://thesmartnik.com/feed.xml" rel="self"/>
-  <updated>2018-07-12T17:11:00+03:00</updated>
+  <updated>2018-08-19T19:09:00+05:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
   <entry>
+    <title>Newcomers guide to profiling memory in Ruby</title>
+    <link rel="alternate" href="https://thesmartnik.com/newcomers-guide-to-memory-profiling-in-ruby.html"/>
+    <id>https://thesmartnik.com/newcomers-guide-to-memory-profiling-in-ruby.html</id>
+    <published>2018-08-19T19:09:00+05:00</published>
+    <updated>2018-08-19T20:33:29+05:00</updated>
+    <author>
+      <name>Mikita Misharin</name>
+    </author>
+    <content type="html">&lt;h2&gt;Preface&lt;/h2&gt;
+
+&lt;p&gt;When only started programming, I loved tasks related to profiling and optimization.
+However, my knowledge on this subject was very limited and I was desparately trying to find articles with some tips and tricks on how to profile properly.
+I thought there was some kinds of secrets or techniques, I should know to profile properly. A few years forward, I can say there a none, really.
+So how one would profile properly?&lt;/p&gt;
+
+&lt;h2&gt;Basic steps&lt;/h2&gt;
+
+&lt;p&gt;Profiling itself is very easy and consists of four basic steps&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Profile&lt;/li&gt;
+&lt;li&gt;Find bottleneck&lt;/li&gt;
+&lt;li&gt;Fix bottleneck&lt;/li&gt;
+&lt;li&gt;Profile again &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;How to profile&lt;/h2&gt;
+
+&lt;p&gt;Ruby has a rich set of decent profiling tools. Some say that it doesn&amp;rsquo;t, but it the tools are good enough, don&amp;rsquo;t worry :)&lt;/p&gt;
+
+&lt;p&gt;Depending on a type of problem you have, you&amp;rsquo;ll need a different type of profiler. We are taling about memory here, so we&amp;rsquo;ll take &lt;a href="https://github.com/SamSaffron/memory_profiler"&gt;memory_profiler&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Splitting the work&lt;/h3&gt;
+
+&lt;p&gt;Profiling itself requires a lot of memory. Therefore, if you start to profile the whole process you have memory issue with. You&amp;rsquo;ll probably run out of memory pretty quick.&lt;/p&gt;
+
+&lt;p&gt;A general solution to this is to divide processing into few major parts and profile each of them one by one.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;It may seem obvious, but I feel like it&amp;rsquo;s an important thing to note&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2&gt;How to find and fix a bottleneck&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Look at the report&lt;/li&gt;
+&lt;li&gt;Find the code that take the most memoty&lt;/li&gt;
+&lt;li&gt;Look at the code. Does it create any unnecessary objects? Can you rewrite to allocate less memory?&lt;/li&gt;
+&lt;li&gt;Optimize it if you can. If not, go to the next piece of memory-heavy piece of code in the report&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Any unnecessary objects?&lt;/h3&gt;
+
+&lt;p&gt;Here is a couple examples to illustrate what I mean. I recently had a problem with middleman. It constantly used more memory than 512 MB dyno allowed. So I had to find a problem. &lt;/p&gt;
+
+&lt;h4&gt;Middleman&lt;/h4&gt;
+
+&lt;p&gt;Middleman created extra array each time I ignored the object.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Before&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="n"&gt;resources&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;map&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;ignored?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;normalized_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ignore!&lt;/span&gt;
+  &lt;span class="k"&gt;elsif&lt;/span&gt; &lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;is_a?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;ProxyResource&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;file_descriptor&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;ignored?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;file_descriptor&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;normalized_relative_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ignore!&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+  &lt;span class="n"&gt;r&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;After&lt;/strong&gt;
+&lt;code&gt;ruby
+resources.each do |r|
+  if ignored?(r.normalized_path)
+    r.ignore!
+  elsif !r.is_a?(ProxyResource) &amp;amp;&amp;amp; r.file_descriptor &amp;amp;&amp;amp; ignored?(r.file_descriptor.normalized_relative_path)
+    r.ignore!
+  end
+end
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Seems like a very small detail. However, I had thousands of ignored objects. And those little arrays accounted for 10% of memory used during initialization.
+Here is a &lt;a href="https://github.com/middleman/middleman/pull/2183"&gt;pr&lt;/a&gt;.
+Usually, this is a small win and it doesn&amp;rsquo;t help much, what you&amp;rsquo;re looking for is big win, like the one bellow.&lt;/p&gt;
+
+&lt;h4&gt;Middleman S3 Sync&lt;/h4&gt;
+
+&lt;p&gt;Gem &amp;lsquo;middleman&lt;em&gt;s3&lt;/em&gt;sync&amp;rsquo; first created sync objects and then ignored ones that doesn&amp;rsquo;t need to be synced. The strategy is ok most of the time, but not in my case of hundreds and thousands of ignored resources. It&amp;rsquo;s very unwise use of resources. Here is a little &lt;a href="https://github.com/fredjean/middleman-s3_sync/pull/155"&gt;pr&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Before&lt;/strong&gt;
+&lt;code&gt;ruby
+def manipulate_resource_list(mm_resources)
+  ::Middleman::S3Sync.mm_resources = mm_resources
+end
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;After&lt;/strong&gt;
+&lt;code&gt;ruby
+def manipulate_resource_list(resources)
+  ::Middleman::S3Sync.mm_resources = resources.each_with_object([]) do |resource, list|
+    next if resource.ignored?
+    list &amp;lt;&amp;lt; resource
+    list &amp;lt;&amp;lt; resource.target_resource if resource.respond_to?(:target_resource)
+  end
+  resources
+end
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;This 8 lines of code freed up 200MB of memory.&lt;/p&gt;
+
+&lt;h3&gt;In report everything is fine. What should I do?&lt;/h3&gt;
+
+&lt;p&gt;These a couple of tips that really helped me during profiling.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;If report is fine. Doulbe check that data you profile with is the same used in production.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Try to disable parts of the code in staging and check if used memory dropped significantly.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr&gt;
+
+&lt;h2&gt;No bottlenecks. My code is perfect. Third-party code is perfect. But it takes SO MUCH MEMORY.&lt;/h2&gt;
+
+&lt;p&gt;Well, if you can&amp;rsquo;t find a room for optimization and everything is fine. The only solution is to rethink the whole approach. Find a diffrent solution to the same problem and rewrite this functionality altogether.&lt;/p&gt;
+
+&lt;p&gt;Many people use above method without attempt to find an actual problem in their code. I don&amp;rsquo;t really like to do so because profiling isn&amp;rsquo;t hard and once you find a problem it&amp;rsquo;s usually easy to fix it.&lt;/p&gt;
+
+&lt;p&gt;Rewrites are usually take so much more time. And when you don&amp;rsquo;t try to find problems in your code, you&amp;rsquo;re bound to make the same mistakes again. Optimization tasks are a great way to learn and grow as an engineer.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>ActiveJob In Retrospect</title>
     <link rel="alternate" href="https://thesmartnik.com/active-job-in-retrospect.html"/>
     <id>https://thesmartnik.com/active-job-in-retrospect.html</id>
-    <published>2018-07-12T17:11:00+03:00</published>
-    <updated>2018-07-27T20:07:51+03:00</updated>
+    <published>2018-07-12T19:11:00+05:00</published>
+    <updated>2018-08-19T19:04:10+05:00</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
@@ -70,8 +198,8 @@
     <title>Generating pdf with wickedpdf in sidekiq</title>
     <link rel="alternate" href="https://thesmartnik.com/generating-pdf-with-wickedpdf-in-sidekiq.html"/>
     <id>https://thesmartnik.com/generating-pdf-with-wickedpdf-in-sidekiq.html</id>
-    <published>2018-06-14T17:11:00+03:00</published>
-    <updated>2018-06-25T00:09:21+03:00</updated>
+    <published>2018-06-14T19:11:00+05:00</published>
+    <updated>2018-08-19T19:04:10+05:00</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
@@ -92,8 +220,8 @@ There is a &lt;a href="https://github.com/mileszs/wicked_pdf/wiki/Background-PDF
     <title>What protected actually does?</title>
     <link rel="alternate" href="https://thesmartnik.com/what-protected-actually-does.html"/>
     <id>https://thesmartnik.com/what-protected-actually-does.html</id>
-    <published>2017-11-25T17:11:00+03:00</published>
-    <updated>2018-06-14T17:31:43+03:00</updated>
+    <published>2017-11-25T19:11:00+05:00</published>
+    <updated>2018-08-19T19:04:10+05:00</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
