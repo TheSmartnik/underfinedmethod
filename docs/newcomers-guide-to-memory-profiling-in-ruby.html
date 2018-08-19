@@ -55,50 +55,49 @@ I actually am
 <div class='article rounded'>
 <div class='article-content'>
 <h1 class='text-center'>Newcomers guide to profiling memory in Ruby</h1>
-<h2>Preface</h2>
+<p>When I only started programming, I loved tasks related to profiling and optimization.
+However, my knowledge on this subject was very limited and I desparately searched for articles with some tips and tricks on how to profile properly.
+I thought there were some secrets or techniques, that I should know to profile properly. A few years forward, I can say there a none, really 🤷‍♂️.</p>
 
-<p>When only started programming, I loved tasks related to profiling and optimization.
-However, my knowledge on this subject was very limited and I was desparately trying to find articles with some tips and tricks on how to profile properly.
-I thought there was some kinds of secrets or techniques, I should know to profile properly. A few years forward, I can say there a none, really.
-So how one would profile properly?</p>
+<p>But here is some tips to give you confidence.</p>
 
 <h2>Basic steps</h2>
 
 <p>Profiling itself is very easy and consists of four basic steps</p>
 
-<ul>
-<li>Profile</li>
-<li>Find bottleneck</li>
-<li>Fix bottleneck</li>
-<li>Profile again </li>
-</ul>
+<ol>
+<li><p>Profile</p></li>
+<li><p>Find bottleneck</p></li>
+<li><p>Fix bottleneck</p></li>
+<li><p>Profile again </p></li>
+</ol>
 
 <h2>How to profile</h2>
 
-<p>Ruby has a rich set of decent profiling tools. Some say that it doesn&rsquo;t, but it the tools are good enough, don&rsquo;t worry :)</p>
+<p>Ruby has a rich set of decent profiling tools. Some would disagree, but in my opinion they are good enough.</p>
 
-<p>Depending on a type of problem you have, you&rsquo;ll need a different type of profiler. We are taling about memory here, so we&rsquo;ll take <a href="https://github.com/SamSaffron/memory_profiler">memory_profiler</a>.</p>
+<p>Depending on a type of problem you have, you&rsquo;ll need a different type of profiler. We are talking about memory here, so we&rsquo;ll take <a href="https://github.com/SamSaffron/memory_profiler">memory_profiler</a>.</p>
 
 <h3>Splitting the work</h3>
 
-<p>Profiling itself requires a lot of memory. Therefore, if you start to profile the whole process you have memory issue with. You&rsquo;ll probably run out of memory pretty quick.</p>
+<p>Profiling itself requires a lot of memory. Therefore, if you start to profile the whole process, you&rsquo;ll probably run out of memory pretty quick.</p>
 
-<p>A general solution to this is to divide processing into few major parts and profile each of them one by one.</p>
+<p>There is a a general solution to this. Divide process into few major parts and profile each of them one by one.</p>
 
-<p><em>It may seem obvious, but I feel like it&rsquo;s an important thing to note</em></p>
+<p><em>It may seem obvious, but I feel like it&rsquo;s an important thing to note.</em></p>
 
 <h2>How to find and fix a bottleneck</h2>
 
-<ul>
-<li>Look at the report</li>
-<li>Find the code that take the most memoty</li>
-<li>Look at the code. Does it create any unnecessary objects? Can you rewrite to allocate less memory?</li>
-<li>Optimize it if you can. If not, go to the next piece of memory-heavy piece of code in the report</li>
-</ul>
+<ol>
+<li><p>Look at the report.</p></li>
+<li><p>Find the code that take the most memory.</p></li>
+<li><p>Look at the code. Does it create any unnecessary objects? Can you rewrite it to allocate less memory?</p></li>
+<li><p>Optimize it if it&rsquo;s possible. If not, go to the next piece of memory-heavy code in the report.</p></li>
+</ol>
 
 <h3>Any unnecessary objects?</h3>
 
-<p>Here is a couple examples to illustrate what I mean. I recently had a problem with middleman. It constantly used more memory than 512 MB dyno allowed. So I had to find a problem. </p>
+<p>Here is a couple examples to illustrate what I mean. I recently had a problem with middleman. It constantly used more memory than my 512 MB dyno allowed. So I had to find a solition. </p>
 
 <h4>Middleman</h4>
 
@@ -114,54 +113,49 @@ So how one would profile properly?</p>
   <span class="n">r</span>
 <span class="k">end</span>
 </code></pre></div>
-<p><strong>After</strong>
-<code>ruby
-resources.each do |r|
-  if ignored?(r.normalized_path)
-    r.ignore!
-  elsif !r.is_a?(ProxyResource) &amp;&amp; r.file_descriptor &amp;&amp; ignored?(r.file_descriptor.normalized_relative_path)
-    r.ignore!
-  end
-end
-</code></p>
+<p><strong>After</strong></p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="n">resources</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span>
+  <span class="k">if</span> <span class="n">ignored?</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="nf">normalized_path</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">.</span><span class="nf">ignore!</span>
+  <span class="k">elsif</span> <span class="o">!</span><span class="n">r</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">ProxyResource</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">r</span><span class="p">.</span><span class="nf">file_descriptor</span> <span class="o">&amp;&amp;</span> <span class="n">ignored?</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="nf">file_descriptor</span><span class="p">.</span><span class="nf">normalized_relative_path</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">.</span><span class="nf">ignore!</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>Seems like a very small thing. However, I had thousands of ignored objects. And those little arrays accounted for 10% of memory used during initialization.
+Here is <a href="https://github.com/middleman/middleman/pull/2183">a link to pr</a>.</p>
 
-<p>Seems like a very small detail. However, I had thousands of ignored objects. And those little arrays accounted for 10% of memory used during initialization.
-Here is a <a href="https://github.com/middleman/middleman/pull/2183">pr</a>.
-Usually, this is a small win and it doesn&rsquo;t help much, what you&rsquo;re looking for is big win, like the one bellow.</p>
+<p>Usually, this is a small win and it doesn&rsquo;t help much, what you&rsquo;re looking for is big win, like the one bellow.</p>
 
 <h4>Middleman S3 Sync</h4>
 
-<p>Gem &lsquo;middleman<em>s3</em>sync&rsquo; first created sync objects and then ignored ones that doesn&rsquo;t need to be synced. The strategy is ok most of the time, but not in my case of hundreds and thousands of ignored resources. It&rsquo;s very unwise use of resources. Here is a little <a href="https://github.com/fredjean/middleman-s3_sync/pull/155">pr</a></p>
+<p>Gem <code>middleman_s3_sync</code> first created sync objects and then ignored ones that doesn&rsquo;t need to be synced. The strategy is ok most of the time, but not in my case of hundreds or even thousands ignored resources. It&rsquo;s very unwise use of resources.</p>
 
-<p><strong>Before</strong>
-<code>ruby
-def manipulate_resource_list(mm_resources)
-  ::Middleman::S3Sync.mm_resources = mm_resources
-end
-</code></p>
-
-<p><strong>After</strong>
-<code>ruby
-def manipulate_resource_list(resources)
-  ::Middleman::S3Sync.mm_resources = resources.each_with_object([]) do |resource, list|
-    next if resource.ignored?
-    list &lt;&lt; resource
-    list &lt;&lt; resource.target_resource if resource.respond_to?(:target_resource)
-  end
-  resources
-end
-</code></p>
-
-<p>This 8 lines of code freed up 200MB of memory.</p>
+<p><strong>Before</strong></p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="k">def</span> <span class="nf">manipulate_resource_list</span><span class="p">(</span><span class="n">mm_resources</span><span class="p">)</span>
+  <span class="o">::</span><span class="no">Middleman</span><span class="o">::</span><span class="no">S3Sync</span><span class="p">.</span><span class="nf">mm_resources</span> <span class="o">=</span> <span class="n">mm_resources</span>
+<span class="k">end</span>
+</code></pre></div>
+<p><strong>After</strong></p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="k">def</span> <span class="nf">manipulate_resource_list</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span>
+  <span class="o">::</span><span class="no">Middleman</span><span class="o">::</span><span class="no">S3Sync</span><span class="p">.</span><span class="nf">mm_resources</span> <span class="o">=</span> <span class="n">resources</span><span class="p">.</span><span class="nf">each_with_object</span><span class="p">([])</span> <span class="k">do</span> <span class="o">|</span><span class="n">resource</span><span class="p">,</span> <span class="n">list</span><span class="o">|</span>
+    <span class="k">next</span> <span class="k">if</span> <span class="n">resource</span><span class="p">.</span><span class="nf">ignored?</span>
+    <span class="n">list</span> <span class="o">&lt;&lt;</span> <span class="n">resource</span>
+    <span class="n">list</span> <span class="o">&lt;&lt;</span> <span class="n">resource</span><span class="p">.</span><span class="nf">target_resource</span> <span class="k">if</span> <span class="n">resource</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:target_resource</span><span class="p">)</span>
+  <span class="k">end</span>
+  <span class="n">resources</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>This 8 lines of code freed up 200MB of memory. Here is <a href="https://github.com/fredjean/middleman-s3_sync/pull/155">a link to this little pr</a></p>
 
 <h3>In report everything is fine. What should I do?</h3>
 
 <p>These a couple of tips that really helped me during profiling.</p>
 
-<ul>
+<ol>
 <li><p>If report is fine. Doulbe check that data you profile with is the same used in production.</p></li>
 <li><p>Try to disable parts of the code in staging and check if used memory dropped significantly.</p></li>
-</ul>
+</ol>
 
 <hr>
 
@@ -169,7 +163,7 @@ end
 
 <p>Well, if you can&rsquo;t find a room for optimization and everything is fine. The only solution is to rethink the whole approach. Find a diffrent solution to the same problem and rewrite this functionality altogether.</p>
 
-<p>Many people use above method without attempt to find an actual problem in their code. I don&rsquo;t really like to do so because profiling isn&rsquo;t hard and once you find a problem it&rsquo;s usually easy to fix it.</p>
+<p>Many people jump to above method without attempting to find an actual problem in their code. I don&rsquo;t really like to do so. Profiling isn&rsquo;t hard and once you find a problem it&rsquo;s usually easy to fix it.</p>
 
 <p>Rewrites are usually take so much more time. And when you don&rsquo;t try to find problems in your code, you&rsquo;re bound to make the same mistakes again. Optimization tasks are a great way to learn and grow as an engineer.</p>
 

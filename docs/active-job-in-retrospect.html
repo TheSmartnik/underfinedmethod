@@ -57,7 +57,15 @@ I actually am
 <h1 class='text-center'>ActiveJob In Retrospect</h1>
 <p>Recently, I replaced <code>ActiveJob</code> with <code>Resque</code> <em>(why it&rsquo;s resque and not sidekiq is a whole other matter)</em>, which got me into thinking of ActiveJob usefulness as a whole.</p>
 
-<p>Creating <code>ActiveRecord</code> was a very reasonable thing to do. It&rsquo;s enough to look at connection adapters for <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb">postgres</a> and <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/connection_adapters/mysql/database_statements.rb">mysql</a> to see why. Lots of methods, quite different implementation. Hard to remember. Hard to switch to projects, where a database is not the one you&rsquo;re used to. And of course, it gives an ability to switch databases without changing code (unless you use db specific features as most of us do)</p>
+<p>Creating <code>ActiveRecord</code> was a very reasonable thing to do. It&rsquo;s enough to look at connection adapters for <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb">postgres</a> and <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/connection_adapters/mysql/database_statements.rb">mysql</a> to see why.</p>
+
+<ol>
+<li><p>Lots of methods</p></li>
+<li><p>Quite different implementation</p></li>
+<li><p>Hard to remember</p></li>
+<li><p>Hard to switch to projects, where a database is not the one you&rsquo;re used to.</p></li>
+<li><p>And of course, it gives an ability to switch databases without changing code (unless you use db specific features as most of us do)</p></li>
+</ol>
 
 <p>Now let&rsquo;s look at ActiveJob&rsquo;s adapters.</p>
 
@@ -92,15 +100,19 @@ I actually am
         <span class="k">end</span>
         <span class="no">Resque</span><span class="p">.</span><span class="nf">enqueue_at_with_queue</span> <span class="n">job</span><span class="p">.</span><span class="nf">queue_name</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="no">JobWrapper</span><span class="p">,</span> <span class="n">job</span><span class="p">.</span><span class="nf">serialize</span>
 </code></pre></div>
-<p>And that&rsquo;s it, just two methods. Do we really need an abstraction layer for just two methods? Sometimes yes, but do we really need an abstraction layer that prevents us from using <a href="https://github.com/lantins/resque-retry/issues/140">features</a> without monkey patching <em>(not to say it&rsquo;s absolute evil, but it rather error prone)</em> or adds unnecessary <a href="https://github.com/mperham/sidekiq/wiki/Active-Job#performance">performance overhead</a>?</p>
+<p>And that&rsquo;s it, just two methods. Do we really need an abstraction layer for just two methods?</p>
+
+<p>Sometimes yes, but do we really need an abstraction layer that prevents us from using <a href="https://github.com/lantins/resque-retry/issues/140">features</a> without monkey patching <em>(not to say it&rsquo;s an absolute evil, but it rather error prone)</em> or adds unnecessary <a href="https://github.com/mperham/sidekiq/wiki/Active-Job#performance">performance overhead</a>?</p>
 
 <hr>
 
 <p>Rails is very good at tools that, provided out of the box, just work. Minimum if any configuration and you all set. However setting up any background job framework is simple. Just five lines of code for sidekiq and a little more for resque.</p>
 
-<p>Other feature that ActiveJob provides is ability to change backend for background processing with one line of code. Although, I think it&rsquo;s a rare use case. I used to it to switch from resque to sidekiq to resque again. And it wasn&rsquo;t one line of code. With <code>ActiveJob</code> the only thing I avoided is a few global &lsquo;Find And Replace&rsquo; over the codebase.</p>
+<p>Other feature that <code>ActiveJob</code> provides is ability to change background processing backend  with one line of code. Although, I think it&rsquo;s a rare use case. I used it once to switch from resque to sidekiq to resque again. And it wasn&rsquo;t one line of code. With <code>ActiveJob</code> the only thing I avoided is a few global &lsquo;Find And Replace&rsquo; over the codebase.</p>
 
-<p>When something is default and works out of the box, there is a lot of inner resistance in replacing it. <code>ActiveJob</code> brings little agility, gives another <em>default</em> interface to learn how to work with and how to test properly. It also adds possibility that some external gems won&rsquo;t work and you would have to some how monkey patch this gem to make it work or get rid of <code>ActiveJob</code> all together. All this and no much profit in return.</p>
+<p>When something is default and works out of the box, there is a lot of inner resistance in replacing it. <code>ActiveJob</code> brings little agility, gives another <em>default</em> interface to learn how to work with and how to test properly. It also adds possibility that some external gems won&rsquo;t work and you would have to some how monkey patch this gem to make it work or get rid of <code>ActiveJob</code> all together.</p>
+
+<p>All this and not much profit in return.</p>
 
 </div>
 </div>

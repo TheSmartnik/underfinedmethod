@@ -14,54 +14,53 @@
     <link rel="alternate" href="https://thesmartnik.com/newcomers-guide-to-memory-profiling-in-ruby.html"/>
     <id>https://thesmartnik.com/newcomers-guide-to-memory-profiling-in-ruby.html</id>
     <published>2018-08-19T19:09:00+05:00</published>
-    <updated>2018-08-19T20:33:29+05:00</updated>
+    <updated>2018-08-19T23:48:00+05:00</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
-    <content type="html">&lt;h2&gt;Preface&lt;/h2&gt;
+    <content type="html">&lt;p&gt;When I only started programming, I loved tasks related to profiling and optimization.
+However, my knowledge on this subject was very limited and I desparately searched for articles with some tips and tricks on how to profile properly.
+I thought there were some secrets or techniques, that I should know to profile properly. A few years forward, I can say there a none, really 🤷‍♂️.&lt;/p&gt;
 
-&lt;p&gt;When only started programming, I loved tasks related to profiling and optimization.
-However, my knowledge on this subject was very limited and I was desparately trying to find articles with some tips and tricks on how to profile properly.
-I thought there was some kinds of secrets or techniques, I should know to profile properly. A few years forward, I can say there a none, really.
-So how one would profile properly?&lt;/p&gt;
+&lt;p&gt;But here is some tips to give you confidence.&lt;/p&gt;
 
 &lt;h2&gt;Basic steps&lt;/h2&gt;
 
 &lt;p&gt;Profiling itself is very easy and consists of four basic steps&lt;/p&gt;
 
-&lt;ul&gt;
-&lt;li&gt;Profile&lt;/li&gt;
-&lt;li&gt;Find bottleneck&lt;/li&gt;
-&lt;li&gt;Fix bottleneck&lt;/li&gt;
-&lt;li&gt;Profile again &lt;/li&gt;
-&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Profile&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Find bottleneck&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Fix bottleneck&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Profile again &lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
 
 &lt;h2&gt;How to profile&lt;/h2&gt;
 
-&lt;p&gt;Ruby has a rich set of decent profiling tools. Some say that it doesn&amp;rsquo;t, but it the tools are good enough, don&amp;rsquo;t worry :)&lt;/p&gt;
+&lt;p&gt;Ruby has a rich set of decent profiling tools. Some would disagree, but in my opinion they are good enough.&lt;/p&gt;
 
-&lt;p&gt;Depending on a type of problem you have, you&amp;rsquo;ll need a different type of profiler. We are taling about memory here, so we&amp;rsquo;ll take &lt;a href="https://github.com/SamSaffron/memory_profiler"&gt;memory_profiler&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Depending on a type of problem you have, you&amp;rsquo;ll need a different type of profiler. We are talking about memory here, so we&amp;rsquo;ll take &lt;a href="https://github.com/SamSaffron/memory_profiler"&gt;memory_profiler&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h3&gt;Splitting the work&lt;/h3&gt;
 
-&lt;p&gt;Profiling itself requires a lot of memory. Therefore, if you start to profile the whole process you have memory issue with. You&amp;rsquo;ll probably run out of memory pretty quick.&lt;/p&gt;
+&lt;p&gt;Profiling itself requires a lot of memory. Therefore, if you start to profile the whole process, you&amp;rsquo;ll probably run out of memory pretty quick.&lt;/p&gt;
 
-&lt;p&gt;A general solution to this is to divide processing into few major parts and profile each of them one by one.&lt;/p&gt;
+&lt;p&gt;There is a a general solution to this. Divide process into few major parts and profile each of them one by one.&lt;/p&gt;
 
-&lt;p&gt;&lt;em&gt;It may seem obvious, but I feel like it&amp;rsquo;s an important thing to note&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;It may seem obvious, but I feel like it&amp;rsquo;s an important thing to note.&lt;/em&gt;&lt;/p&gt;
 
 &lt;h2&gt;How to find and fix a bottleneck&lt;/h2&gt;
 
-&lt;ul&gt;
-&lt;li&gt;Look at the report&lt;/li&gt;
-&lt;li&gt;Find the code that take the most memoty&lt;/li&gt;
-&lt;li&gt;Look at the code. Does it create any unnecessary objects? Can you rewrite to allocate less memory?&lt;/li&gt;
-&lt;li&gt;Optimize it if you can. If not, go to the next piece of memory-heavy piece of code in the report&lt;/li&gt;
-&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Look at the report.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Find the code that take the most memory.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Look at the code. Does it create any unnecessary objects? Can you rewrite it to allocate less memory?&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Optimize it if it&amp;rsquo;s possible. If not, go to the next piece of memory-heavy code in the report.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
 
 &lt;h3&gt;Any unnecessary objects?&lt;/h3&gt;
 
-&lt;p&gt;Here is a couple examples to illustrate what I mean. I recently had a problem with middleman. It constantly used more memory than 512 MB dyno allowed. So I had to find a problem. &lt;/p&gt;
+&lt;p&gt;Here is a couple examples to illustrate what I mean. I recently had a problem with middleman. It constantly used more memory than my 512 MB dyno allowed. So I had to find a solition. &lt;/p&gt;
 
 &lt;h4&gt;Middleman&lt;/h4&gt;
 
@@ -77,54 +76,49 @@ So how one would profile properly?&lt;/p&gt;
   &lt;span class="n"&gt;r&lt;/span&gt;
 &lt;span class="k"&gt;end&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;After&lt;/strong&gt;
-&lt;code&gt;ruby
-resources.each do |r|
-  if ignored?(r.normalized_path)
-    r.ignore!
-  elsif !r.is_a?(ProxyResource) &amp;amp;&amp;amp; r.file_descriptor &amp;amp;&amp;amp; ignored?(r.file_descriptor.normalized_relative_path)
-    r.ignore!
-  end
-end
-&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;After&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="n"&gt;resources&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;ignored?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;normalized_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ignore!&lt;/span&gt;
+  &lt;span class="k"&gt;elsif&lt;/span&gt; &lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;is_a?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;ProxyResource&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;file_descriptor&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;ignored?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;file_descriptor&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;normalized_relative_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ignore!&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Seems like a very small thing. However, I had thousands of ignored objects. And those little arrays accounted for 10% of memory used during initialization.
+Here is &lt;a href="https://github.com/middleman/middleman/pull/2183"&gt;a link to pr&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;Seems like a very small detail. However, I had thousands of ignored objects. And those little arrays accounted for 10% of memory used during initialization.
-Here is a &lt;a href="https://github.com/middleman/middleman/pull/2183"&gt;pr&lt;/a&gt;.
-Usually, this is a small win and it doesn&amp;rsquo;t help much, what you&amp;rsquo;re looking for is big win, like the one bellow.&lt;/p&gt;
+&lt;p&gt;Usually, this is a small win and it doesn&amp;rsquo;t help much, what you&amp;rsquo;re looking for is big win, like the one bellow.&lt;/p&gt;
 
 &lt;h4&gt;Middleman S3 Sync&lt;/h4&gt;
 
-&lt;p&gt;Gem &amp;lsquo;middleman&lt;em&gt;s3&lt;/em&gt;sync&amp;rsquo; first created sync objects and then ignored ones that doesn&amp;rsquo;t need to be synced. The strategy is ok most of the time, but not in my case of hundreds and thousands of ignored resources. It&amp;rsquo;s very unwise use of resources. Here is a little &lt;a href="https://github.com/fredjean/middleman-s3_sync/pull/155"&gt;pr&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Gem &lt;code&gt;middleman_s3_sync&lt;/code&gt; first created sync objects and then ignored ones that doesn&amp;rsquo;t need to be synced. The strategy is ok most of the time, but not in my case of hundreds or even thousands ignored resources. It&amp;rsquo;s very unwise use of resources.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;Before&lt;/strong&gt;
-&lt;code&gt;ruby
-def manipulate_resource_list(mm_resources)
-  ::Middleman::S3Sync.mm_resources = mm_resources
-end
-&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;After&lt;/strong&gt;
-&lt;code&gt;ruby
-def manipulate_resource_list(resources)
-  ::Middleman::S3Sync.mm_resources = resources.each_with_object([]) do |resource, list|
-    next if resource.ignored?
-    list &amp;lt;&amp;lt; resource
-    list &amp;lt;&amp;lt; resource.target_resource if resource.respond_to?(:target_resource)
-  end
-  resources
-end
-&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;This 8 lines of code freed up 200MB of memory.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Before&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;manipulate_resource_list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mm_resources&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Middleman&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;S3Sync&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;mm_resources&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mm_resources&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;After&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;manipulate_resource_list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;resources&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Middleman&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;S3Sync&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;mm_resources&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;resources&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;each_with_object&lt;/span&gt;&lt;span class="p"&gt;([])&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;resource&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+    &lt;span class="k"&gt;next&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;resource&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ignored?&lt;/span&gt;
+    &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;resource&lt;/span&gt;
+    &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;resource&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;target_resource&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;resource&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;respond_to?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;:target_resource&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+  &lt;span class="n"&gt;resources&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This 8 lines of code freed up 200MB of memory. Here is &lt;a href="https://github.com/fredjean/middleman-s3_sync/pull/155"&gt;a link to this little pr&lt;/a&gt;&lt;/p&gt;
 
 &lt;h3&gt;In report everything is fine. What should I do?&lt;/h3&gt;
 
 &lt;p&gt;These a couple of tips that really helped me during profiling.&lt;/p&gt;
 
-&lt;ul&gt;
+&lt;ol&gt;
 &lt;li&gt;&lt;p&gt;If report is fine. Doulbe check that data you profile with is the same used in production.&lt;/p&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;Try to disable parts of the code in staging and check if used memory dropped significantly.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
+&lt;/ol&gt;
 
 &lt;hr&gt;
 
@@ -132,7 +126,7 @@ end
 
 &lt;p&gt;Well, if you can&amp;rsquo;t find a room for optimization and everything is fine. The only solution is to rethink the whole approach. Find a diffrent solution to the same problem and rewrite this functionality altogether.&lt;/p&gt;
 
-&lt;p&gt;Many people use above method without attempt to find an actual problem in their code. I don&amp;rsquo;t really like to do so because profiling isn&amp;rsquo;t hard and once you find a problem it&amp;rsquo;s usually easy to fix it.&lt;/p&gt;
+&lt;p&gt;Many people jump to above method without attempting to find an actual problem in their code. I don&amp;rsquo;t really like to do so. Profiling isn&amp;rsquo;t hard and once you find a problem it&amp;rsquo;s usually easy to fix it.&lt;/p&gt;
 
 &lt;p&gt;Rewrites are usually take so much more time. And when you don&amp;rsquo;t try to find problems in your code, you&amp;rsquo;re bound to make the same mistakes again. Optimization tasks are a great way to learn and grow as an engineer.&lt;/p&gt;
 </content>
@@ -142,13 +136,21 @@ end
     <link rel="alternate" href="https://thesmartnik.com/active-job-in-retrospect.html"/>
     <id>https://thesmartnik.com/active-job-in-retrospect.html</id>
     <published>2018-07-12T19:11:00+05:00</published>
-    <updated>2018-08-19T19:04:10+05:00</updated>
+    <updated>2018-08-19T23:53:33+05:00</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
     <content type="html">&lt;p&gt;Recently, I replaced &lt;code&gt;ActiveJob&lt;/code&gt; with &lt;code&gt;Resque&lt;/code&gt; &lt;em&gt;(why it&amp;rsquo;s resque and not sidekiq is a whole other matter)&lt;/em&gt;, which got me into thinking of ActiveJob usefulness as a whole.&lt;/p&gt;
 
-&lt;p&gt;Creating &lt;code&gt;ActiveRecord&lt;/code&gt; was a very reasonable thing to do. It&amp;rsquo;s enough to look at connection adapters for &lt;a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb"&gt;postgres&lt;/a&gt; and &lt;a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/connection_adapters/mysql/database_statements.rb"&gt;mysql&lt;/a&gt; to see why. Lots of methods, quite different implementation. Hard to remember. Hard to switch to projects, where a database is not the one you&amp;rsquo;re used to. And of course, it gives an ability to switch databases without changing code (unless you use db specific features as most of us do)&lt;/p&gt;
+&lt;p&gt;Creating &lt;code&gt;ActiveRecord&lt;/code&gt; was a very reasonable thing to do. It&amp;rsquo;s enough to look at connection adapters for &lt;a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb"&gt;postgres&lt;/a&gt; and &lt;a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/connection_adapters/mysql/database_statements.rb"&gt;mysql&lt;/a&gt; to see why.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Lots of methods&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Quite different implementation&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Hard to remember&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Hard to switch to projects, where a database is not the one you&amp;rsquo;re used to.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;And of course, it gives an ability to switch databases without changing code (unless you use db specific features as most of us do)&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
 
 &lt;p&gt;Now let&amp;rsquo;s look at ActiveJob&amp;rsquo;s adapters.&lt;/p&gt;
 
@@ -183,15 +185,19 @@ end
         &lt;span class="k"&gt;end&lt;/span&gt;
         &lt;span class="no"&gt;Resque&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;enqueue_at_with_queue&lt;/span&gt; &lt;span class="n"&gt;job&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;queue_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;timestamp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;JobWrapper&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;job&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;serialize&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;And that&amp;rsquo;s it, just two methods. Do we really need an abstraction layer for just two methods? Sometimes yes, but do we really need an abstraction layer that prevents us from using &lt;a href="https://github.com/lantins/resque-retry/issues/140"&gt;features&lt;/a&gt; without monkey patching &lt;em&gt;(not to say it&amp;rsquo;s absolute evil, but it rather error prone)&lt;/em&gt; or adds unnecessary &lt;a href="https://github.com/mperham/sidekiq/wiki/Active-Job#performance"&gt;performance overhead&lt;/a&gt;?&lt;/p&gt;
+&lt;p&gt;And that&amp;rsquo;s it, just two methods. Do we really need an abstraction layer for just two methods?&lt;/p&gt;
+
+&lt;p&gt;Sometimes yes, but do we really need an abstraction layer that prevents us from using &lt;a href="https://github.com/lantins/resque-retry/issues/140"&gt;features&lt;/a&gt; without monkey patching &lt;em&gt;(not to say it&amp;rsquo;s an absolute evil, but it rather error prone)&lt;/em&gt; or adds unnecessary &lt;a href="https://github.com/mperham/sidekiq/wiki/Active-Job#performance"&gt;performance overhead&lt;/a&gt;?&lt;/p&gt;
 
 &lt;hr&gt;
 
 &lt;p&gt;Rails is very good at tools that, provided out of the box, just work. Minimum if any configuration and you all set. However setting up any background job framework is simple. Just five lines of code for sidekiq and a little more for resque.&lt;/p&gt;
 
-&lt;p&gt;Other feature that ActiveJob provides is ability to change backend for background processing with one line of code. Although, I think it&amp;rsquo;s a rare use case. I used to it to switch from resque to sidekiq to resque again. And it wasn&amp;rsquo;t one line of code. With &lt;code&gt;ActiveJob&lt;/code&gt; the only thing I avoided is a few global &amp;lsquo;Find And Replace&amp;rsquo; over the codebase.&lt;/p&gt;
+&lt;p&gt;Other feature that &lt;code&gt;ActiveJob&lt;/code&gt; provides is ability to change background processing backend  with one line of code. Although, I think it&amp;rsquo;s a rare use case. I used it once to switch from resque to sidekiq to resque again. And it wasn&amp;rsquo;t one line of code. With &lt;code&gt;ActiveJob&lt;/code&gt; the only thing I avoided is a few global &amp;lsquo;Find And Replace&amp;rsquo; over the codebase.&lt;/p&gt;
 
-&lt;p&gt;When something is default and works out of the box, there is a lot of inner resistance in replacing it. &lt;code&gt;ActiveJob&lt;/code&gt; brings little agility, gives another &lt;em&gt;default&lt;/em&gt; interface to learn how to work with and how to test properly. It also adds possibility that some external gems won&amp;rsquo;t work and you would have to some how monkey patch this gem to make it work or get rid of &lt;code&gt;ActiveJob&lt;/code&gt; all together. All this and no much profit in return.&lt;/p&gt;
+&lt;p&gt;When something is default and works out of the box, there is a lot of inner resistance in replacing it. &lt;code&gt;ActiveJob&lt;/code&gt; brings little agility, gives another &lt;em&gt;default&lt;/em&gt; interface to learn how to work with and how to test properly. It also adds possibility that some external gems won&amp;rsquo;t work and you would have to some how monkey patch this gem to make it work or get rid of &lt;code&gt;ActiveJob&lt;/code&gt; all together.&lt;/p&gt;
+
+&lt;p&gt;All this and not much profit in return.&lt;/p&gt;
 </content>
   </entry>
   <entry>
