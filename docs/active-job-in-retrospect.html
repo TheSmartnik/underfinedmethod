@@ -61,7 +61,7 @@ I actually am
 
 <ol>
 <li><p>Lots of methods</p></li>
-<li><p>Quite different implementation</p></li>
+<li><p>Quite a different implementation</p></li>
 <li><p>Hard to remember</p></li>
 <li><p>Hard to switch to projects, where a database is not the one you&rsquo;re used to.</p></li>
 <li><p>And of course, it gives an ability to switch databases without changing code (unless you use db specific features as most of us do)</p></li>
@@ -106,11 +106,11 @@ I actually am
 
 <hr>
 
-<p>Rails is very good at tools that, provided out of the box, just work. Minimum if any configuration and you all set. However setting up any background job framework is simple. Just five lines of code for sidekiq and a little more for resque.</p>
+<p>Rails is very good at tools that, provided out of the box, just work. Minimum if any configuration and you all set. However, setting up any background job framework is simple. Just five lines of code for sidekiq and a little more for resque.</p>
 
-<p>Other feature that <code>ActiveJob</code> provides is ability to change background processing backend  with one line of code. Although, I think it&rsquo;s a rare use case. I used it once to switch from resque to sidekiq to resque again. And it wasn&rsquo;t one line of code. With <code>ActiveJob</code> the only thing I avoided is a few global &lsquo;Find And Replace&rsquo; over the codebase.</p>
+<p>Another feature that <code>ActiveJob</code> provides is an ability to change background processing backend  with one line of code. Although, I think it&rsquo;s a rare use case. I used it once to switch from resque to sidekiq to resque again. And it wasn&rsquo;t one line of code. With <code>ActiveJob</code> the only thing I avoided is a few global &lsquo;Find And Replace&rsquo; over the codebase.</p>
 
-<p>When something is default and works out of the box, there is a lot of inner resistance in replacing it. <code>ActiveJob</code> brings little agility, gives another <em>default</em> interface to learn how to work with and how to test properly. It also adds possibility that some external gems won&rsquo;t work and you would have to some how monkey patch this gem to make it work or get rid of <code>ActiveJob</code> all together.All this and not much profit in return.</p>
+<p>When something is a default and works out of the box, there is a lot of inner resistance in replacing it. <code>ActiveJob</code> brings little agility, gives another <em>default</em> interface to learn how to work with and how to test properly. It also adds the possibility that some external gems won&rsquo;t work and you would have to somehow monkey patch this gem to make it work or get rid of <code>ActiveJob</code> altogether. All this and not much profit in return.</p>
 
 </div>
 </div>

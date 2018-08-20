@@ -181,11 +181,11 @@ Here is &lt;a href="https://github.com/middleman/middleman/pull/2183"&gt;a link 
 
 &lt;hr&gt;
 
-&lt;p&gt;Rails is very good at tools that, provided out of the box, just work. Minimum if any configuration and you all set. However setting up any background job framework is simple. Just five lines of code for sidekiq and a little more for resque.&lt;/p&gt;
+&lt;p&gt;Rails is very good at tools that, provided out of the box, just work. Minimum if any configuration and you all set. However, setting up any background job framework is simple. Just five lines of code for sidekiq and a little more for resque.&lt;/p&gt;
 
-&lt;p&gt;Other feature that &lt;code&gt;ActiveJob&lt;/code&gt; provides is ability to change background processing backend  with one line of code. Although, I think it&amp;rsquo;s a rare use case. I used it once to switch from resque to sidekiq to resque again. And it wasn&amp;rsquo;t one line of code. With &lt;code&gt;ActiveJob&lt;/code&gt; the only thing I avoided is a few global &amp;lsquo;Find And Replace&amp;rsquo; over the codebase.&lt;/p&gt;
+&lt;p&gt;Another feature that &lt;code&gt;ActiveJob&lt;/code&gt; provides is an ability to change background processing backend  with one line of code. Although, I think it&amp;rsquo;s a rare use case. I used it once to switch from resque to sidekiq to resque again. And it wasn&amp;rsquo;t one line of code. With &lt;code&gt;ActiveJob&lt;/code&gt; the only thing I avoided is a few global &amp;lsquo;Find And Replace&amp;rsquo; over the codebase.&lt;/p&gt;
 
-&lt;p&gt;When something is default and works out of the box, there is a lot of inner resistance in replacing it. &lt;code&gt;ActiveJob&lt;/code&gt; brings little agility, gives another &lt;em&gt;default&lt;/em&gt; interface to learn how to work with and how to test properly. It also adds possibility that some external gems won&amp;rsquo;t work and you would have to some how monkey patch this gem to make it work or get rid of &lt;code&gt;ActiveJob&lt;/code&gt; all together.All this and not much profit in return.&lt;/p&gt;
+&lt;p&gt;When something is a default and works out of the box, there is a lot of inner resistance in replacing it. &lt;code&gt;ActiveJob&lt;/code&gt; brings little agility, gives another &lt;em&gt;default&lt;/em&gt; interface to learn how to work with and how to test properly. It also adds the possibility that some external gems won&amp;rsquo;t work and you would have to somehow monkey patch this gem to make it work or get rid of &lt;code&gt;ActiveJob&lt;/code&gt; altogether. All this and not much profit in return.&lt;/p&gt;
 </content>
   </entry>
   <entry>
