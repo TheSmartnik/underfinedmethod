@@ -56,10 +56,10 @@ I actually am
 <div class='article-content'>
 <h1 class='text-center'>Ruby Memory Profiling in Practice</h1>
 <p>When I only started programming, I loved tasks related to profiling and optimization.
-However, my knowledge on this subject was very limited and I desparately searched for articles with some tips and tricks on how to profile properly.
+However, my knowledge on this subject was very limited and I desperately searched for articles with some tips and tricks on how to profile properly.
 I thought there were some secrets or techniques, that I should know. A few years forward, I can say there a none, really 🤷‍♂️.</p>
 
-<p>But here is some tips to give you confidence.</p>
+<p>But here are some tips to give you confidence.</p>
 
 <h2>Basic steps</h2>
 
@@ -74,7 +74,7 @@ I thought there were some secrets or techniques, that I should know. A few years
 
 <h2>How to profile</h2>
 
-<p>Ruby has a rich set of decent profiling tools. Some would disagree, but in my opinion they are good enough.</p>
+<p>Ruby has a rich set of decent profiling tools. Some would disagree, but in my opinion, they are good enough.</p>
 
 <p>Depending on a type of problem you have, you&rsquo;ll need a different type of profiler. We are talking about memory here, so we&rsquo;ll take <a href="https://github.com/SamSaffron/memory_profiler">memory_profiler</a>.</p>
 
@@ -82,7 +82,7 @@ I thought there were some secrets or techniques, that I should know. A few years
 
 <p>Profiling itself requires a lot of memory. Therefore, if you start to profile the whole process, you&rsquo;ll probably run out of memory pretty quick.</p>
 
-<p>There is a a general solution to this. Divide process into few major parts and profile each of them one by one.</p>
+<p>There is a general solution to this. Divide process into few major parts and profile each of them one by one.</p>
 
 <p><em>It may seem obvious, but I feel like it&rsquo;s an important thing to note.</em></p>
 
@@ -90,14 +90,14 @@ I thought there were some secrets or techniques, that I should know. A few years
 
 <ol>
 <li><p>Look at the report.</p></li>
-<li><p>Find the code that take the most memory.</p></li>
+<li><p>Find the code that takes the most memory.</p></li>
 <li><p>Look at the code. Does it create any unnecessary objects? Can you rewrite it to allocate less memory?</p></li>
 <li><p>Optimize it if it&rsquo;s possible. If not, go to the next piece of memory-heavy code in the report.</p></li>
 </ol>
 
 <h3>Any unnecessary objects?</h3>
 
-<p>Here is a couple examples to illustrate what I mean. I recently had a problem with middleman. It constantly used more memory than my 512 MB dyno allowed. So I had to find a solition. </p>
+<p>Here is a couple of examples to illustrate what I mean. I recently had a problem with middleman. It constantly used more memory than my 512 MB dyno allowed. So I had to find a solution. </p>
 
 <h4>Middleman</h4>
 
@@ -115,11 +115,11 @@ I thought there were some secrets or techniques, that I should know. A few years
 <p>Seems like a very small thing. However, I had thousands of ignored objects. And those little arrays accounted for 10% of memory used during initialization.
 Here is <a href="https://github.com/middleman/middleman/pull/2183">a link to pr</a>.</p>
 
-<p>Usually, this is a small win and it doesn&rsquo;t help much, what you&rsquo;re looking for is big win, like the one bellow.</p>
+<p>Usually, this is a small win and it doesn&rsquo;t help much, what you&rsquo;re looking for is a big win, like the one below.</p>
 
 <h4>Middleman S3 Sync</h4>
 
-<p>Gem <code>middleman_s3_sync</code> first created sync objects and then ignored ones that doesn&rsquo;t need to be synced. The strategy is ok most of the time, but not in my case of hundreds or even thousands ignored resources. It&rsquo;s very unwise use of resources.</p>
+<p>Gem <code>middleman_s3_sync</code> first created sync objects and then ignored ones that don&rsquo;t need to be synced. The strategy is ok most of the time, but not in my case of hundreds or even thousands ignored resources. It&rsquo;s very unwise use of resources.</p>
 
 <p><strong>Before</strong></p>
 <div class="highlight"><pre class="highlight ruby"><code><span class="k">def</span> <span class="nf">manipulate_resource_list</span><span class="p">(</span><span class="n">mm_resources</span><span class="p">)</span>
@@ -138,12 +138,12 @@ Here is <a href="https://github.com/middleman/middleman/pull/2183">a link to pr<
 </code></pre></div>
 <p>This 8 lines of code freed up 200MB of memory. Here is <a href="https://github.com/fredjean/middleman-s3_sync/pull/155">a link to this little pr</a></p>
 
-<h3>In report everything is fine. What should I do?</h3>
+<h3>In a report everything is fine. What should I do?</h3>
 
 <p>These a couple of tips that really helped me during profiling.</p>
 
 <ol>
-<li><p>If report is fine. Doulbe check that data you profile with is the same used in production.</p></li>
+<li><p>If the report is fine. Double check that data you profile with is the same used in production.</p></li>
 <li><p>Try to disable parts of the code in staging and check if used memory dropped significantly.</p></li>
 </ol>
 
@@ -151,11 +151,11 @@ Here is <a href="https://github.com/middleman/middleman/pull/2183">a link to pr<
 
 <h2>No bottlenecks. My code is perfect. Third-party code is perfect. But it takes SO MUCH MEMORY.</h2>
 
-<p>Well, if you can&rsquo;t find a room for optimization and everything is fine. The only solution is to rethink the whole approach. Find a diffrent solution to the same problem and rewrite this functionality altogether.</p>
+<p>Well, if you can&rsquo;t find a room for optimization and everything is fine. The only solution is to rethink the whole approach. Find a different solution to the same problem and rewrite this functionality altogether.</p>
 
 <p>Many people jump to above method without attempting to find an actual problem in their code. I don&rsquo;t really like to do so. Profiling isn&rsquo;t hard and once you find a problem it&rsquo;s usually easy to fix it.</p>
 
-<p>Rewrites are usually take so much more time. And when you don&rsquo;t try to find problems in your code, you&rsquo;re bound to make the same mistakes again. Optimization tasks are a great way to learn and grow as an engineer.</p>
+<p>Rewrites are usually taking so much more time. And when you don&rsquo;t try to find problems in your code, you&rsquo;re bound to make the same mistakes again. Optimization tasks are a great way to learn and grow as an engineer.</p>
 
 </div>
 </div>
