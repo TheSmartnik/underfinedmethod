@@ -33,8 +33,9 @@
                   I actually am
 
             .row.mt-3.mb-5
+              - width = 12 / config.social_media_links.size
               - config.social_media_links.each do |name, src|
-                .col-6.text-center
+                .text-center{ class: "col-#{width}" }
                   = link_to src do
                     .icon__wrapper
                       = image_tag "https://unpkg.com/simple-icons@latest/icons/#{name}.svg", class: 'icon__social'

@@ -30,6 +30,7 @@ config.domain = 'thesmartnik.com'
 config.social_media_links = {
   stackoverflow: 'https://stackoverflow.com/users/4308435',
   github: 'https://github.com/TheSmartnik',
+  rss: '/feed.xml'
 }
 
 ignore 'article.html.haml'
