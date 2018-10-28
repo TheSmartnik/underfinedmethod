@@ -1,5 +1,13 @@
+- read_next = current_article.article_previous || blog.articles.first
+
 = partial 'layout' do
   .article.rounded
     .article-content
-      %h1.text-center=  current_article.title
+      %h1.mb-4= current_article.title
       = current_article.body
+
+  %h3.mt-5 Read Next:
+  = link_to read_next.url do
+    .article.rounded
+      .article-content
+        %h2= read_next.title
