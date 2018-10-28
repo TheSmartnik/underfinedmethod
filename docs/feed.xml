@@ -5,7 +5,7 @@
   <id>https://thesmartnik.com/</id>
   <link href="https://thesmartnik.com/"/>
   <link href="https://thesmartnik.com/feed.xml" rel="self"/>
-  <updated>2018-08-19T19:09:00+05:00</updated>
+  <updated>2018-08-19T14:09:00Z</updated>
   <author>
     <name>Blog Author</name>
   </author>
@@ -13,8 +13,8 @@
     <title>Ruby Memory Profiling in Practice</title>
     <link rel="alternate" href="https://thesmartnik.com/ruby-memory-profiling-in-practice.html"/>
     <id>https://thesmartnik.com/ruby-memory-profiling-in-practice.html</id>
-    <published>2018-08-19T19:09:00+05:00</published>
-    <updated>2018-08-20T20:02:02+05:00</updated>
+    <published>2018-08-19T14:09:00Z</published>
+    <updated>2018-08-20T18:02:02+03:00</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
@@ -125,8 +125,8 @@ Here is &lt;a href="https://github.com/middleman/middleman/pull/2183"&gt;a link 
     <title>ActiveJob In Retrospect</title>
     <link rel="alternate" href="https://thesmartnik.com/active-job-in-retrospect.html"/>
     <id>https://thesmartnik.com/active-job-in-retrospect.html</id>
-    <published>2018-07-12T19:11:00+05:00</published>
-    <updated>2018-08-20T00:39:06+05:00</updated>
+    <published>2018-07-12T14:11:00Z</published>
+    <updated>2018-08-20T18:05:40+03:00</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
@@ -136,7 +136,7 @@ Here is &lt;a href="https://github.com/middleman/middleman/pull/2183"&gt;a link 
 
 &lt;ol&gt;
 &lt;li&gt;&lt;p&gt;Lots of methods&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Quite different implementation&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Quite a different implementation&lt;/p&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;Hard to remember&lt;/p&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;Hard to switch to projects, where a database is not the one you&amp;rsquo;re used to.&lt;/p&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;And of course, it gives an ability to switch databases without changing code (unless you use db specific features as most of us do)&lt;/p&gt;&lt;/li&gt;
@@ -192,8 +192,8 @@ Here is &lt;a href="https://github.com/middleman/middleman/pull/2183"&gt;a link 
     <title>Generating pdf with wickedpdf in sidekiq</title>
     <link rel="alternate" href="https://thesmartnik.com/generating-pdf-with-wickedpdf-in-sidekiq.html"/>
     <id>https://thesmartnik.com/generating-pdf-with-wickedpdf-in-sidekiq.html</id>
-    <published>2018-06-14T19:11:00+05:00</published>
-    <updated>2018-08-19T19:04:10+05:00</updated>
+    <published>2018-06-14T14:11:00Z</published>
+    <updated>2018-08-19T17:04:10+03:00</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
@@ -214,8 +214,8 @@ There is a &lt;a href="https://github.com/mileszs/wicked_pdf/wiki/Background-PDF
     <title>What protected actually does?</title>
     <link rel="alternate" href="https://thesmartnik.com/what-protected-actually-does.html"/>
     <id>https://thesmartnik.com/what-protected-actually-does.html</id>
-    <published>2017-11-25T19:11:00+05:00</published>
-    <updated>2018-08-19T19:04:10+05:00</updated>
+    <published>2017-11-25T14:11:00Z</published>
+    <updated>2018-08-19T17:04:10+03:00</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
