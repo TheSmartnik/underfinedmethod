@@ -9,7 +9,7 @@ xml.urlset 'xmlns' => "http://www.sitemaps.org/schemas/sitemap/0.9" do
   pages.each do |page|
     xml.url do
       xml.loc "https://#{config.domain}#{page.url}"
-      xml.lastmod Date.today.to_time.iso8601
+      xml.lastmod File.mtime(page.source_file).utc.iso8601
       xml.changefreq page.data.changefreq || "weekly"
       xml.priority page.data.priority || "1.0"
     end

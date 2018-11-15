@@ -2,31 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://thesmartnik.com/what-protected-actually-does.html</loc>
-    <lastmod>2018-10-28T00:00:00+03:00</lastmod>
+    <lastmod>2018-08-19T14:04:10Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://thesmartnik.com/active-job-in-retrospect.html</loc>
-    <lastmod>2018-10-28T00:00:00+03:00</lastmod>
+    <lastmod>2018-08-20T15:05:40Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://thesmartnik.com/ruby-memory-profiling-in-practice.html</loc>
-    <lastmod>2018-10-28T00:00:00+03:00</lastmod>
+    <lastmod>2018-08-20T15:02:02Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://thesmartnik.com/debugging-adventures-1.html</loc>
+    <lastmod>2018-11-15T00:02:09Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://thesmartnik.com/generating-pdf-with-wickedpdf-in-sidekiq.html</loc>
-    <lastmod>2018-10-28T00:00:00+03:00</lastmod>
+    <lastmod>2018-08-19T14:04:10Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://thesmartnik.com/</loc>
-    <lastmod>2018-10-28T00:00:00+03:00</lastmod>
+    <lastmod>2018-10-28T09:01:19Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

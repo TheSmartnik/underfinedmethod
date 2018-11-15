@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<meta charset='utf-8'>
+<meta content='IE=edge;chrome=1' http-equiv='X-UA-Compatible'>
+<meta content='width=device-width, initial-scale=1' name='viewport'>
+<title>
+Debugging Adventures: #1 | Write-only tech blog
+</title>
+<link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" />
+<link href="stylesheets/style.css" rel="stylesheet" />
+</head>
+<body>
+<div id='main' role='main'>
+<div class='container mt-5 mb-5'>
+<div class='row'>
+<div class='col-12 col-md-4 col-lg-3'>
+<a href="/"><img src="images/profile.jpg" class="rounded-circle mx-auto d-block image__profile" alt="Profile" />
+</a><div class='text-center'>
+<h4>
+<a href="/"><b>Nikita Misharin</b>
+</a></h4>
+<h5>
+<div class='small'>
+<svg class='icon__ruby text-center' viewBox='0 0 50 50'>
+<use xlink:href='images/ruby.svg#surface1'></use>
+</svg>
+<span class='title__developer'>
+Developer
+</span>
+</div>
+<div class='mt-3'>
+Writing stuff on the internet to appear smarter, than
+<br>
+I actually am
+</div>
+</h5>
+</div>
+<div class='row mt-3 mb-5'>
+<div class='col-4 text-center'>
+<a href="https://stackoverflow.com/users/4308435"><div class='icon__wrapper'>
+<img src="https://unpkg.com/simple-icons@latest/icons/stackoverflow.svg" class="icon__social" alt="Stackoverflow" />
+</div>
+</a></div>
+<div class='col-4 text-center'>
+<a href="https://github.com/TheSmartnik"><div class='icon__wrapper'>
+<img src="https://unpkg.com/simple-icons@latest/icons/github.svg" class="icon__social" alt="Github" />
+</div>
+</a></div>
+<div class='col-4 text-center'>
+<a href="feed.xml"><div class='icon__wrapper'>
+<img src="https://unpkg.com/simple-icons@latest/icons/rss.svg" class="icon__social" alt="Rss" />
+</div>
+</a></div>
+</div>
+</div>
+<div class='col-12 col-md-8 col-lg-9'>
+<div class='article rounded'>
+<div class='article-content'>
+<h1 class='mb-4'>Debugging Adventures: #1</h1>
+<p>I love debugging. You know, the one that makes you dig into the source code of a library or a language. When everything should work just fine, but it doesn&rsquo;t. When you have no idea what to do and desperately executing same commands hoping for a different result. And it is an adventure really: you kinda know the path, but have no idea where it will lead you.</p>
+
+<p>Anyway, a few months ago I&rsquo;ve been looking through <a href="https://ruby-doc.org/core-2.5.1/Array.html#method-i-concat">an official ruby documentation</a> and I had noticed that links to <code>Array#+</code> are broken. Immediately after that, encouraged by the thought, that soon I&rsquo;ll be a ruby contributor <em>(no one need to know it&rsquo;s been just documentation, right?)</em> I opened up a source code and&hellip; Nothing. Documentation to a method looked just fine.</p>
+
+<p>And that point, I knew it won&rsquo;t be as easy as I initially thought.</p>
+
+<p>I wasn&rsquo;t really sure what to do at first. Then, a small detail caught my attention: a sidebar. A sidebar on the left of the page, where a link to <code>#+</code> worked just fine. </p>
+
+<p>Well, that looks great, I thought. I&rsquo;ll just copy the link from sidebar and change documentation to something like.</p>
+<div class="highlight"><pre class="highlight plaintext"><code>/*
+ * ...
+ *  See also {Array#+}[#method-i-2B].
+ */
+</code></pre></div>
+<p>I had my doubts, of course. I wasn&rsquo;t sure how <code>i-2B</code> is generated and can get be changed by some unforeseen events. I did a bit of digging into rdoc&rsquo;s source code and <a href="https://github.com/ruby/rdoc/blob/b7449e4b2d71c16e58f5a5db859867e8c90246ac/lib/rdoc/method_attr.rb#L291-L295">it seemed to be fine</a>. So I&rsquo;ve decided that&rsquo;ll do.</p>
+
+<p>Reading this, you probably saying to yourself: &ldquo;Wait a minute, this just looks like a hack. Why do you have to hard code a link? Why can&rsquo;t it be generated automatically?&rdquo;.</p>
+
+<p>Well, that was my thought exactly. I tried to convince myself that the solution above is good enough and working link better, than not a working one etc. But I couldn&rsquo;t really do it, so I decided to take a quick look. Maybe it would be a quick fix, who knows.</p>
+
+<p>So, a few moments after, I was staring at Rdoc&rsquo;s source code. And I continue doing so for six straight hours. I don&rsquo;t know if you aware, but Rdoc code isn&rsquo;t <a href="https://github.com/ruby/rdoc/blob/b7449e4b2d71c16e58f5a5db859867e8c90246ac/lib/rdoc/markup/to_html_crossref.rb#L147-L154">the most readable</a>. I mean it does <a href="https://github.com/TheSmartnik/rdoc/blob/0e655546b4d3f9d00982f12f87f968dd5b96103a/lib/rdoc/cross_reference.rb#L31-L73">raise questions</a>.</p>
+
+<p>And in the end? Well the whole fix, just took <a href="https://github.com/ruby/rdoc/pull/632">one line of code</a>.</p>
+
+<p>Why am I telling this? Well, I feel like debugging is often daunting and  frustrating: nothing is working and you don&rsquo;t know why. But if you look at this from another perspective, it also can be fun and adventurous. Your princes will probably be in another caster most of the time, but it should never stop you from trying to save her 😁</p>
+
+</div>
+</div>
+<h3 class='mt-5'>Read Next:</h3>
+<a href="ruby-memory-profiling-in-practice.html"><div class='article rounded'>
+<div class='article-content'>
+<h2>Ruby Memory Profiling in Practice</h2>
+</div>
+</div>
+</a>
+</div>
+</div>
+</div>
+</div>
+</body>
+<script async='' src='https://www.googletagmanager.com/gtag/js?id=UA-120732219-1'></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-120732219-1');
+</script>
+</html>

@@ -5,16 +5,52 @@
   <id>https://thesmartnik.com/</id>
   <link href="https://thesmartnik.com/"/>
   <link href="https://thesmartnik.com/feed.xml" rel="self"/>
-  <updated>2018-08-19T14:09:00Z</updated>
+  <updated>2018-10-24T13:21:00Z</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Debugging Adventures: #1</title>
+    <link rel="alternate" href="https://thesmartnik.com/debugging-adventures-1.html"/>
+    <id>https://thesmartnik.com/debugging-adventures-1.html</id>
+    <published>2018-10-24T13:21:00Z</published>
+    <updated>2018-11-15T00:02:09Z</updated>
+    <author>
+      <name>Mikita Misharin</name>
+    </author>
+    <content type="html">&lt;p&gt;I love debugging. You know, the one that makes you dig into the source code of a library or a language. When everything should work just fine, but it doesn&amp;rsquo;t. When you have no idea what to do and desperately executing same commands hoping for a different result. And it is an adventure really: you kinda know the path, but have no idea where it will lead you.&lt;/p&gt;
+
+&lt;p&gt;Anyway, a few months ago I&amp;rsquo;ve been looking through &lt;a href="https://ruby-doc.org/core-2.5.1/Array.html#method-i-concat"&gt;an official ruby documentation&lt;/a&gt; and I had noticed that links to &lt;code&gt;Array#+&lt;/code&gt; are broken. Immediately after that, encouraged by the thought, that soon I&amp;rsquo;ll be a ruby contributor &lt;em&gt;(no one need to know it&amp;rsquo;s been just documentation, right?)&lt;/em&gt; I opened up a source code and&amp;hellip; Nothing. Documentation to a method looked just fine.&lt;/p&gt;
+
+&lt;p&gt;And that point, I knew it won&amp;rsquo;t be as easy as I initially thought.&lt;/p&gt;
+
+&lt;p&gt;I wasn&amp;rsquo;t really sure what to do at first. Then, a small detail caught my attention: a sidebar. A sidebar on the left of the page, where a link to &lt;code&gt;#+&lt;/code&gt; worked just fine. &lt;/p&gt;
+
+&lt;p&gt;Well, that looks great, I thought. I&amp;rsquo;ll just copy the link from sidebar and change documentation to something like.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight plaintext"&gt;&lt;code&gt;/*
+ * ...
+ *  See also {Array#+}[#method-i-2B].
+ */
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;I had my doubts, of course. I wasn&amp;rsquo;t sure how &lt;code&gt;i-2B&lt;/code&gt; is generated and can get be changed by some unforeseen events. I did a bit of digging into rdoc&amp;rsquo;s source code and &lt;a href="https://github.com/ruby/rdoc/blob/b7449e4b2d71c16e58f5a5db859867e8c90246ac/lib/rdoc/method_attr.rb#L291-L295"&gt;it seemed to be fine&lt;/a&gt;. So I&amp;rsquo;ve decided that&amp;rsquo;ll do.&lt;/p&gt;
+
+&lt;p&gt;Reading this, you probably saying to yourself: &amp;ldquo;Wait a minute, this just looks like a hack. Why do you have to hard code a link? Why can&amp;rsquo;t it be generated automatically?&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;Well, that was my thought exactly. I tried to convince myself that the solution above is good enough and working link better, than not a working one etc. But I couldn&amp;rsquo;t really do it, so I decided to take a quick look. Maybe it would be a quick fix, who knows.&lt;/p&gt;
+
+&lt;p&gt;So, a few moments after, I was staring at Rdoc&amp;rsquo;s source code. And I continue doing so for six straight hours. I don&amp;rsquo;t know if you aware, but Rdoc code isn&amp;rsquo;t &lt;a href="https://github.com/ruby/rdoc/blob/b7449e4b2d71c16e58f5a5db859867e8c90246ac/lib/rdoc/markup/to_html_crossref.rb#L147-L154"&gt;the most readable&lt;/a&gt;. I mean it does &lt;a href="https://github.com/TheSmartnik/rdoc/blob/0e655546b4d3f9d00982f12f87f968dd5b96103a/lib/rdoc/cross_reference.rb#L31-L73"&gt;raise questions&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;And in the end? Well the whole fix, just took &lt;a href="https://github.com/ruby/rdoc/pull/632"&gt;one line of code&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Why am I telling this? Well, I feel like debugging is often daunting and  frustrating: nothing is working and you don&amp;rsquo;t know why. But if you look at this from another perspective, it also can be fun and adventurous. Your princes will probably be in another caster most of the time, but it should never stop you from trying to save her 😁&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>Ruby Memory Profiling in Practice</title>
     <link rel="alternate" href="https://thesmartnik.com/ruby-memory-profiling-in-practice.html"/>
     <id>https://thesmartnik.com/ruby-memory-profiling-in-practice.html</id>
     <published>2018-08-19T14:09:00Z</published>
-    <updated>2018-08-20T18:02:02+03:00</updated>
+    <updated>2018-08-20T15:02:02Z</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
@@ -126,7 +162,7 @@ Here is &lt;a href="https://github.com/middleman/middleman/pull/2183"&gt;a link 
     <link rel="alternate" href="https://thesmartnik.com/active-job-in-retrospect.html"/>
     <id>https://thesmartnik.com/active-job-in-retrospect.html</id>
     <published>2018-07-12T14:11:00Z</published>
-    <updated>2018-08-20T18:05:40+03:00</updated>
+    <updated>2018-08-20T15:05:40Z</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
@@ -193,7 +229,7 @@ Here is &lt;a href="https://github.com/middleman/middleman/pull/2183"&gt;a link 
     <link rel="alternate" href="https://thesmartnik.com/generating-pdf-with-wickedpdf-in-sidekiq.html"/>
     <id>https://thesmartnik.com/generating-pdf-with-wickedpdf-in-sidekiq.html</id>
     <published>2018-06-14T14:11:00Z</published>
-    <updated>2018-08-19T17:04:10+03:00</updated>
+    <updated>2018-08-19T14:04:10Z</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
@@ -215,7 +251,7 @@ There is a &lt;a href="https://github.com/mileszs/wicked_pdf/wiki/Background-PDF
     <link rel="alternate" href="https://thesmartnik.com/what-protected-actually-does.html"/>
     <id>https://thesmartnik.com/what-protected-actually-does.html</id>
     <published>2017-11-25T14:11:00Z</published>
-    <updated>2018-08-19T17:04:10+03:00</updated>
+    <updated>2018-08-19T14:04:10Z</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
