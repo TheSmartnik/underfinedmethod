@@ -22,9 +22,9 @@ Then, ruby 1.9 with YARV came along. Continuations became to be [harmful](http:/
 
 ## Fibers
 
-In other languages, fiber is the name for a lightweight thread. In ruby, it is a coroutine. Why it's not named coroutine, then you might ask? Well, because fiber sounds cooler. [I'm seruous](http://www.atdot.net/~ko1/pub/ContinuationFest-ruby.pdf).
+In other languages, fiber is the name for a lightweight thread. In ruby, it is a coroutine. Why it's not named coroutine then, you might ask? Well, because fiber sounds better [apparently](http://www.atdot.net/~ko1/pub/ContinuationFest-ruby.pdf).
 
-There are two types of coroutines semicouroutune and coroutine. They only differ in the way they transfer control.
+There are two types of coroutines: semicouroutune and coroutine. They only differ in the way they transfer control.
 
 ### Semicouroutune a.k.a Asymmetric Coroutines
 
@@ -34,7 +34,7 @@ This is the default mode for ruby fibers
 
 ### Symmetric Coroutines
 
-If you `require 'fiber'`, though. `Fiber` becomes asymmetric coroutine, which basically means that now, fibers can transfer control between one another _(there are limitations in ruby, though. But here is the basic idea)_
+If you `require 'fiber'`, though. `Fiber` becomes symmetric coroutine, which basically means that now, fibers can transfer control between one another _(there are limitations in ruby, though. But here is the basic idea)_
 
 Okay, now when we become familiar with fibers and coroutines. Let's look at the thing you can build with them.
 
@@ -83,22 +83,22 @@ Anyway, let's see how it works.
 4. Go back to step .2
 
 
-This construct might be useful for heavy computations, where saving the previous state would save a lot of time and doing it through fiber would also be more readable than trying to save the previuos state yourself _(Unfortunately, I couldn't find any good example in the wild, though_ 😞 _)_
+This construct might be useful for heavy computations, where saving the previous state would save a lot of time and doing it with `Enumerator` would also be more readable than trying to save the previuos state yourself _(Unfortunately, I couldn't find any good example in the wild, though_ 😞 _)_
 
 A more general use case, as I already said: lazy enumerator.
 
 
 ## The Fun Part
 
-You've read a lot of theory, not it's time for **the fun part**. The best way to learn something is to build it, right? Also, it's probably the only time you'll ever actually use fibers, so let's get to it.
+You've read a lot of theory, not it's time for _the fun part_. The best way to learn something is to build it, right? Also, it's probably the only time you'll ever actually use fibers, so let's get to it.
 
 ### Generator
 
 Ok, let's look at the `Enumerator` example again. What we can say about it?
   
   1. Enumerator accepts block
-  2. The Block is being called with an argument
-  3. The Argument has a method `<<` that returns computation result
+  2. The block is being called with an argument
+  3. The argument has a method `<<` that returns computation result
 
 That's pretty much all we need to be able to construct a simple abstraction over fiber. We'll call it `Generator` because that's what it is.
 
@@ -156,4 +156,4 @@ generator.next    # => 1
 
 For a long time, I couldn't understand why fibers exist. I thought there was something special about them, something that I just couldn't grasp. Turned out there wasn't. They are very specific things, created for a very specific task.
 
-I hope that this article gave you a better understanding what `Fiber` is, what it is not and how it is used.
+I hope that this article gave you a better understanding of what `Fiber` is, what it's not and how it's used.
