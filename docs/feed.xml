@@ -14,13 +14,13 @@
     <link rel="alternate" href="https://thesmartnik.com/why-on-earth-do-fibers-exist.html"/>
     <id>https://thesmartnik.com/why-on-earth-do-fibers-exist.html</id>
     <published>2018-11-23T14:11:00Z</published>
-    <updated>2018-11-24T17:26:30Z</updated>
+    <updated>2018-11-24T17:44:17Z</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
     <content type="html">&lt;p&gt;First, let&amp;rsquo;s answer the question right away. Fibers were created so one could implement generator pattern which in ruby is incorporated in &lt;code&gt;Enumerator&lt;/code&gt;. That&amp;rsquo;s it.&lt;/p&gt;
 
-&lt;p&gt;To quote &lt;a href="https://www.amazon.com/dp/0596516177"&gt;one book&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;To quote &lt;a href="https://www.amazon.com/dp/0596516177"&gt;one book:&lt;/a&gt;&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;Fibers are an advanced and relatively obscure control structure; the majority of Ruby programmers will never need to use the Fiber class directly&lt;/p&gt;

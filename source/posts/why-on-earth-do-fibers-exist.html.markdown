@@ -9,7 +9,7 @@ tags:
 
 First, let's answer the question right away. Fibers were created so one could implement generator pattern which in ruby is incorporated in `Enumerator`. That's it.
 
-To quote [one book](https://www.amazon.com/dp/0596516177):
+To quote [one book:](https://www.amazon.com/dp/0596516177)
 > Fibers are an advanced and relatively obscure control structure; the majority of Ruby programmers will never need to use the Fiber class directly
 
 Now that you know the truth. Let's start from the beginning.

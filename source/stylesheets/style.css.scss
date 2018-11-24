@@ -80,6 +80,26 @@ h1 {
     font-family: 'Oswald', sans-serif;
     margin-bottom: 1rem;
   }
+
+  a {
+
+    &:after {
+      opacity: 0.8;
+    }
+
+    &:after {
+      content: " ";
+      background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIxMDI0IiB3aWR0aD0iNzY4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik02NDAgNzY4SDEyOFYyNTcuOTA1OTk5OTk5OTk5OTVMMjU2IDI1NlYxMjhIMHY3NjhoNzY4VjU3Nkg2NDBWNzY4ek0zODQgMTI4bDEyOCAxMjhMMzIwIDQ0OGwxMjggMTI4IDE5Mi0xOTIgMTI4IDEyOFYxMjhIMzg0eiIvPjwvc3ZnPg==);
+      background-size: cover;
+      position: relative;
+      display: inline-block;
+      bottom: 6px;
+      width: 8px;
+      height: 10px;
+      left: 2px;
+      opacity: 0.5;
+    }
+  }
 }
 
 .highlight {
@@ -99,7 +119,6 @@ a {
     color: darken($primary-color, 10%);
     text-decoration: none;
   }
-
 }
 
 blockquote {
