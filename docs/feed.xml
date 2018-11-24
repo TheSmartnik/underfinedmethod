@@ -5,10 +5,168 @@
   <id>https://thesmartnik.com/</id>
   <link href="https://thesmartnik.com/"/>
   <link href="https://thesmartnik.com/feed.xml" rel="self"/>
-  <updated>2018-10-24T13:21:00Z</updated>
+  <updated>2018-11-23T14:11:00Z</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Why on earth do fibers exist?</title>
+    <link rel="alternate" href="https://thesmartnik.com/why-on-earth-do-fibers-exist.html"/>
+    <id>https://thesmartnik.com/why-on-earth-do-fibers-exist.html</id>
+    <published>2018-11-23T14:11:00Z</published>
+    <updated>2018-11-24T09:56:01Z</updated>
+    <author>
+      <name>Mikita Misharin</name>
+    </author>
+    <content type="html">&lt;p&gt;First, let&amp;rsquo;s answer the question right away. Fibers were created so one could implement generator pattern which is in ruby called &lt;code&gt;Enumerator&lt;/code&gt;. That&amp;rsquo;s it.&lt;/p&gt;
+
+&lt;p&gt;To quote &lt;a href="https://www.amazon.com/dp/0596516177"&gt;one book&lt;/a&gt;:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Fibers are an advanced and relatively obscure control structure; the majority of Ruby programmers will never need to use the Fiber class directly&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Now that you know the truth. Let&amp;rsquo;s start from the beginning.&lt;/p&gt;
+
+&lt;h2&gt;A bit of history&lt;/h2&gt;
+
+&lt;p&gt;Back in ruby 1.8 &lt;a href="https://github.com/ruby/ruby/blob/ruby_1_8_7/lib/generator.rb"&gt;generator was implemented through continuations&lt;/a&gt;, little-known control structure inspired by Lisp. Continuations main use was again to make generators and programs that needed &lt;a href="https://en.wikipedia.org/wiki/Backtracking"&gt;backtracking&lt;/a&gt;: &lt;a href="http://www.randomhacks.net/2005/10/11/amb-operator/"&gt;ambiguous operator&lt;/a&gt;, for example. It has bugs,  unpredictable behavior and implemented only in CRuby. Very few understand what it is for and even fewer actually tried to use it.&lt;/p&gt;
+
+&lt;p&gt;Then, ruby 1.9 with YARV came along. Continuations became to be &lt;a href="http://www.atdot.net/~ko1/pub/ContinuationFest-ruby.pdf"&gt;harmful&lt;/a&gt; and were moved to the standard library. &lt;code&gt;Enumerator&lt;/code&gt; was rewritten in C using fibers.&lt;/p&gt;
+
+&lt;h2&gt;Fibers&lt;/h2&gt;
+
+&lt;p&gt;In other languages, fiber is the name for a lightweight thread. In ruby, it is a coroutine. Why it&amp;rsquo;s not named coroutine then, you might ask? Well, because fiber sounds better &lt;a href="http://www.atdot.net/~ko1/pub/ContinuationFest-ruby.pdf"&gt;apparently&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;There are two types of coroutines: semicouroutune and coroutine. They only differ in the way they transfer control.&lt;/p&gt;
+
+&lt;h3&gt;Semicouroutune a.k.a Asymmetric Coroutines&lt;/h3&gt;
+
+&lt;p&gt;These coroutines called asmymetric, because there is fundamental asymmetry between caller and coroutine. &lt;em&gt;Resumed&lt;/em&gt; by the caller, coroutine &lt;strong&gt;can&amp;rsquo;t&lt;/strong&gt; transfer control to any other coroutine, only to suspend itself and &lt;em&gt;yield&lt;/em&gt; control back to the caller.&lt;/p&gt;
+
+&lt;p&gt;This is the default mode for ruby fibers&lt;/p&gt;
+
+&lt;h3&gt;Symmetric Coroutines&lt;/h3&gt;
+
+&lt;p&gt;If you &lt;code&gt;require &amp;#39;fiber&amp;#39;&lt;/code&gt;, though. &lt;code&gt;Fiber&lt;/code&gt; becomes symmetric coroutine, which basically means that now, fibers can transfer control between one another &lt;em&gt;(there are limitations in ruby, though. But here is the basic idea)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Okay, now when we become familiar with fibers and coroutines. Let&amp;rsquo;s look at the thing you can build with them.&lt;/p&gt;
+
+&lt;h2&gt;Generator&lt;/h2&gt;
+
+&lt;h3&gt;Why would I need generators, again?&lt;/h3&gt;
+
+&lt;p&gt;I&amp;rsquo;ll be completely honest. You probably don&amp;rsquo;t.&lt;/p&gt;
+
+&lt;p&gt;Having said that, they are pretty cool. All laziness (&lt;code&gt;Enumerator::Lazy&lt;/code&gt;) in ruby is implemented using them. Also, they are generally useful for partial computations, which we&amp;rsquo;ll see in a bit.&lt;/p&gt;
+
+&lt;h3&gt;Partial computations&lt;/h3&gt;
+
+&lt;p&gt;Here is the basic generator&amp;rsquo;s algorithm:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Compute a partial result&lt;/li&gt;
+&lt;li&gt;Return the result back to the caller&lt;/li&gt;
+&lt;li&gt;Save the state&lt;/li&gt;
+&lt;li&gt;If needed, resume the generator to get the next result&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Let&amp;rsquo;s see an example with enumerator:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="n"&gt;enumerator&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;Enumerator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;new&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;yielder&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+  &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+  &lt;span class="kp"&gt;loop&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+    &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+    &lt;span class="n"&gt;yielder&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="n"&gt;enumerator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; 1&lt;/span&gt;
+&lt;span class="n"&gt;enumerator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; 2&lt;/span&gt;
+&lt;span class="n"&gt;enumerator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; 3&lt;/span&gt;
+&lt;span class="n"&gt;enumerator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;rewind&lt;/span&gt;
+&lt;span class="n"&gt;enumerator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; 1&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Yeah, I know. That example probably doesn&amp;rsquo;t raise your eyebrows, except for the syntax, of course. I mean use &lt;code&gt;&amp;lt;&amp;lt;&lt;/code&gt; to return control, really?&lt;/p&gt;
+
+&lt;p&gt;Anyway, let&amp;rsquo;s see how it works.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;You pass a block, where you do computation&lt;/li&gt;
+&lt;li&gt;On &lt;code&gt;#next&lt;/code&gt; the block is called from the beginning or where it left of&lt;/li&gt;
+&lt;li&gt;You return from the function with a result using &lt;code&gt;&amp;lt;&amp;lt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Go back to step .2&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;This construct might be useful for heavy computations, where saving the previous state would save a lot of time and doing it with &lt;code&gt;Enumerator&lt;/code&gt; would also be more readable than trying to save the previuos state yourself &lt;em&gt;(Unfortunately, I couldn&amp;rsquo;t find any good example in the wild, though&lt;/em&gt; 😞 &lt;em&gt;)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;A more general use case, as I already said: lazy enumerator.&lt;/p&gt;
+
+&lt;h2&gt;The Fun Part&lt;/h2&gt;
+
+&lt;p&gt;You&amp;rsquo;ve read a lot of theory, not it&amp;rsquo;s time for &lt;em&gt;the fun part&lt;/em&gt;. The best way to learn something is to build it, right? Also, it&amp;rsquo;s probably the only time you&amp;rsquo;ll ever actually use fibers, so let&amp;rsquo;s get to it.&lt;/p&gt;
+
+&lt;h3&gt;Generator&lt;/h3&gt;
+
+&lt;p&gt;Ok, let&amp;rsquo;s look at the &lt;code&gt;Enumerator&lt;/code&gt; example again. What we can say about it?&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Enumerator accepts block&lt;/li&gt;
+&lt;li&gt;The block is being called with an argument&lt;/li&gt;
+&lt;li&gt;The argument has a method &lt;code&gt;&amp;lt;&amp;lt;&lt;/code&gt; that returns computation result&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;That&amp;rsquo;s pretty much all we need to be able to construct a simple abstraction over fiber. We&amp;rsquo;ll call it &lt;code&gt;Generator&lt;/code&gt; because that&amp;rsquo;s what it is.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Generator&lt;/span&gt;
+  &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Yielder&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;                         &lt;span class="c1"&gt;# Argument that accepts &amp;lt;&amp;lt;&lt;/span&gt;
+      &lt;span class="no"&gt;Fiber&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;yield&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;                  &lt;span class="c1"&gt;# And returns computation result&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;initialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;block&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;              &lt;span class="c1"&gt;# Accepts block&lt;/span&gt;
+    &lt;span class="vi"&gt;@block&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;block&lt;/span&gt;           
+    &lt;span class="vi"&gt;@fiber&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;create_fiber&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;next&lt;/span&gt;
+    &lt;span class="vi"&gt;@fiber&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;resume&lt;/span&gt;             
+  &lt;span class="k"&gt;end&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;rewind&lt;/span&gt;                  
+    &lt;span class="vi"&gt;@fiber&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;create_fiber&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+
+  &lt;span class="kp"&gt;private&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;create_fiber&lt;/span&gt;            
+    &lt;span class="no"&gt;Fiber&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;new&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+      &lt;span class="vi"&gt;@block&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;Yielder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;new&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;        &lt;span class="c1"&gt;# Block being call with an argument&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;That&amp;rsquo;s it. Here is the tiniest possible version of a generator.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s test that it works as expected. We&amp;rsquo;ll use &lt;code&gt;Enumerable&lt;/code&gt; this time, so you could also understand how &lt;code&gt;Enumerable#to_enum&lt;/code&gt; works&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="n"&gt;generator&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;  &lt;span class="no"&gt;Generator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;new&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;yielder&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+  &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;..&lt;/span&gt;&lt;span class="no"&gt;Float&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;INFINITY&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nf"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+    &lt;span class="n"&gt;yielder&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt;    &lt;span class="c1"&gt;# =&amp;gt; 1&lt;/span&gt;
+&lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt;    &lt;span class="c1"&gt;# =&amp;gt; 2&lt;/span&gt;
+&lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt;    &lt;span class="c1"&gt;# =&amp;gt; 3&lt;/span&gt;
+&lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;rewind&lt;/span&gt; 
+&lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt;    &lt;span class="c1"&gt;# =&amp;gt; 1&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;For a long time, I couldn&amp;rsquo;t understand why fibers exist. I thought there was something special about them, something that I just couldn&amp;rsquo;t grasp. Turned out there wasn&amp;rsquo;t. They are very specific things, created for a very specific task.&lt;/p&gt;
+
+&lt;p&gt;I hope that this article gave you a better understanding of what &lt;code&gt;Fiber&lt;/code&gt; is, what it&amp;rsquo;s not and how it&amp;rsquo;s used.&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>Debugging Adventures: #1</title>
     <link rel="alternate" href="https://thesmartnik.com/debugging-adventures-1.html"/>
