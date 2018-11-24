@@ -14,11 +14,11 @@
     <link rel="alternate" href="https://thesmartnik.com/why-on-earth-do-fibers-exist.html"/>
     <id>https://thesmartnik.com/why-on-earth-do-fibers-exist.html</id>
     <published>2018-11-23T14:11:00Z</published>
-    <updated>2018-11-24T09:56:01Z</updated>
+    <updated>2018-11-24T17:26:30Z</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
-    <content type="html">&lt;p&gt;First, let&amp;rsquo;s answer the question right away. Fibers were created so one could implement generator pattern which is in ruby called &lt;code&gt;Enumerator&lt;/code&gt;. That&amp;rsquo;s it.&lt;/p&gt;
+    <content type="html">&lt;p&gt;First, let&amp;rsquo;s answer the question right away. Fibers were created so one could implement generator pattern which in ruby is incorporated in &lt;code&gt;Enumerator&lt;/code&gt;. That&amp;rsquo;s it.&lt;/p&gt;
 
 &lt;p&gt;To quote &lt;a href="https://www.amazon.com/dp/0596516177"&gt;one book&lt;/a&gt;:&lt;/p&gt;
 
@@ -58,7 +58,7 @@
 
 &lt;p&gt;I&amp;rsquo;ll be completely honest. You probably don&amp;rsquo;t.&lt;/p&gt;
 
-&lt;p&gt;Having said that, they are pretty cool. All laziness (&lt;code&gt;Enumerator::Lazy&lt;/code&gt;) in ruby is implemented using them. Also, they are generally useful for partial computations, which we&amp;rsquo;ll see in a bit.&lt;/p&gt;
+&lt;p&gt;Having said that, they are pretty cool. They are generally useful for partial computations or laziness. In ruby, there are two options to make something lazy: through &lt;code&gt;Enumerator#next&lt;/code&gt;(which uses fibers) and through &lt;code&gt;Enumerator::Lazy&lt;/code&gt;(which doesn&amp;rsquo;t)&lt;/p&gt;
 
 &lt;h3&gt;Partial computations&lt;/h3&gt;
 
@@ -79,6 +79,7 @@
     &lt;span class="n"&gt;yielder&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;
   &lt;span class="k"&gt;end&lt;/span&gt;
 &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="c1"&gt;# =&amp;gt; #&amp;lt;Enumerator: #&amp;lt;Enumerator::Generator:0x00007fe6ac9d41e0&amp;gt;:each&amp;gt;&lt;/span&gt;
 
 &lt;span class="n"&gt;enumerator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; 1&lt;/span&gt;
 &lt;span class="n"&gt;enumerator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; 2&lt;/span&gt;
@@ -86,7 +87,7 @@
 &lt;span class="n"&gt;enumerator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;rewind&lt;/span&gt;
 &lt;span class="n"&gt;enumerator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; 1&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Yeah, I know. That example probably doesn&amp;rsquo;t raise your eyebrows, except for the syntax, of course. I mean use &lt;code&gt;&amp;lt;&amp;lt;&lt;/code&gt; to return control, really?&lt;/p&gt;
+&lt;p&gt;Yeah, I know. That example probably doesn&amp;rsquo;t raise your eyebrows, except for the syntax, of course. I mean use &lt;code&gt;&amp;lt;&amp;lt;&lt;/code&gt; to return control, really? There is an even more confusing alias for that &amp;ndash; &lt;code&gt;yield&lt;/code&gt;, which corresponds to &lt;code&gt;Fiber.yield&lt;/code&gt;, but has nothing to do with ruby keyword &lt;code&gt;yield&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Anyway, let&amp;rsquo;s see how it works.&lt;/p&gt;
 
@@ -97,9 +98,10 @@
 &lt;li&gt;Go back to step .2&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;This construct might be useful for heavy computations, where saving the previous state would save a lot of time and doing it with &lt;code&gt;Enumerator&lt;/code&gt; would also be more readable than trying to save the previuos state yourself &lt;em&gt;(Unfortunately, I couldn&amp;rsquo;t find any good example in the wild, though&lt;/em&gt; 😞 &lt;em&gt;)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Enumerator&lt;/code&gt; allows you to do two types of iterations: internal and external.
+ In daily life, we usually see enumerators as internal iterators. It is returned everytime you call &lt;code&gt;Enumerable&lt;/code&gt; methods without any arguments and what allows you to chain those methods together: &lt;code&gt;each.with_index&lt;/code&gt; etc.&lt;/p&gt;
 
-&lt;p&gt;A more general use case, as I already said: lazy enumerator.&lt;/p&gt;
+&lt;p&gt;Additionally, you can use enumerator as an external iterator as shown in the example above. This construct is might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with &lt;code&gt;Enumerator&lt;/code&gt; would also be more readable than trying to save the previous state yourself. Unfortunately, it&amp;rsquo;s not a very popular method_(as laziness in ruby in general) and I couldn&amp;rsquo;t find any good example in the wild 😞&lt;/p&gt;
 
 &lt;h2&gt;The Fun Part&lt;/h2&gt;
 
@@ -147,7 +149,7 @@
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;That&amp;rsquo;s it. Here is the tiniest possible version of a generator.&lt;/p&gt;
 
-&lt;p&gt;Let&amp;rsquo;s test that it works as expected. We&amp;rsquo;ll use &lt;code&gt;Enumerable&lt;/code&gt; this time, so you could also understand how &lt;code&gt;Enumerable#to_enum&lt;/code&gt; works&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s test that it works as expected. We&amp;rsquo;ll use &lt;code&gt;Enumerable&lt;/code&gt; this time.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="n"&gt;generator&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;  &lt;span class="no"&gt;Generator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;new&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;yielder&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
   &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;..&lt;/span&gt;&lt;span class="no"&gt;Float&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;INFINITY&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nf"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
     &lt;span class="n"&gt;yielder&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;

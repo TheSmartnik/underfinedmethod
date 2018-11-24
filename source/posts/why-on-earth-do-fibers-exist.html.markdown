@@ -7,7 +7,7 @@ tags:
 
 ---
 
-First, let's answer the question right away. Fibers were created so one could implement generator pattern which is in ruby called `Enumerator`. That's it.
+First, let's answer the question right away. Fibers were created so one could implement generator pattern which in ruby is incorporated in `Enumerator`. That's it.
 
 To quote [one book](https://www.amazon.com/dp/0596516177):
 > Fibers are an advanced and relatively obscure control structure; the majority of Ruby programmers will never need to use the Fiber class directly
@@ -44,7 +44,7 @@ Okay, now when we become familiar with fibers and coroutines. Let's look at the 
 
 I'll be completely honest. You probably don't.
 
-Having said that, they are pretty cool. All laziness (`Enumerator::Lazy`) in ruby is implemented using them. Also, they are generally useful for partial computations, which we'll see in a bit.
+Having said that, they are pretty cool. They are generally useful for partial computations or laziness. In ruby, there are two options to make something lazy: through `Enumerator#next`(which uses fibers) and through `Enumerator::Lazy`(which doesn't)
 
 ### Partial computations
 
@@ -65,6 +65,7 @@ enumerator = Enumerator.new do |yielder|
     yielder << i
   end
 end
+# => #<Enumerator: #<Enumerator::Generator:0x00007fe6ac9d41e0>:each>
 
 enumerator.next   # => 1
 enumerator.next   # => 2
@@ -73,7 +74,7 @@ enumerator.rewind
 enumerator.next   # => 1
 ```
 
-Yeah, I know. That example probably doesn't raise your eyebrows, except for the syntax, of course. I mean use `<<` to return control, really?
+Yeah, I know. That example probably doesn't raise your eyebrows, except for the syntax, of course. I mean use `<<` to return control, really? There is an even more confusing alias for that -- `yield`, which corresponds to `Fiber.yield`, but has nothing to do with ruby keyword `yield`.
 
 Anyway, let's see how it works.
 
@@ -82,10 +83,10 @@ Anyway, let's see how it works.
 3. You return from the function with a result using `<<`
 4. Go back to step .2
 
+`Enumerator` allows you to do two types of iterations: internal and external.
+ In daily life, we usually see enumerators as internal iterators. It is returned everytime you call `Enumerable` methods without any arguments and what allows you to chain those methods together: `each.with_index` etc.
 
-This construct might be useful for heavy computations, where saving the previous state would save a lot of time and doing it with `Enumerator` would also be more readable than trying to save the previuos state yourself _(Unfortunately, I couldn't find any good example in the wild, though_ 😞 _)_
-
-A more general use case, as I already said: lazy enumerator.
+Additionally, you can use enumerator as an external iterator as shown in the example above. This construct is might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with `Enumerator` would also be more readable than trying to save the previous state yourself. Unfortunately, it's not a very popular method_(as laziness in ruby in general) and I couldn't find any good example in the wild 😞
 
 
 ## The Fun Part
@@ -136,7 +137,7 @@ end
 
 That's it. Here is the tiniest possible version of a generator.
 
-Let's test that it works as expected. We'll use `Enumerable` this time, so you could also understand how `Enumerable#to_enum` works
+Let's test that it works as expected. We'll use `Enumerable` this time.
 
 ```ruby
 generator =  Generator.new do |yielder|
