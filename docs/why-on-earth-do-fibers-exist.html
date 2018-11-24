@@ -72,13 +72,13 @@ I actually am
 
 <h2>A bit of history</h2>
 
-<p>Back in ruby 1.8 <a href="https://github.com/ruby/ruby/blob/ruby_1_8_7/lib/generator.rb">generator was implemented through continuations</a>, little-known control structure inspired by Lisp. Continuations main use was again to make generators and programs that needed <a href="https://en.wikipedia.org/wiki/Backtracking">backtracking</a>: <a href="http://www.randomhacks.net/2005/10/11/amb-operator/">ambiguous operator</a>, for example. It has bugs,  unpredictable behavior and implemented only in CRuby. Very few understand what it is for and even fewer actually tried to use it.</p>
+<p>Back in ruby 1.8 <a href="https://github.com/ruby/ruby/blob/ruby_1_8_7/lib/generator.rb">generator was implemented through continuations</a>, little-known control structure inspired by Lisp. Continuations main use is again to make generators and programs that needed <a href="https://en.wikipedia.org/wiki/Backtracking">backtracking:</a> <a href="http://www.randomhacks.net/2005/10/11/amb-operator/">ambiguous operator</a>, for example. It has bugs,  unpredictable behavior and implemented only in CRuby. Very few understand what it is for and even fewer actually tried to use it.</p>
 
 <p>Then, ruby 1.9 with YARV came along. Continuations became to be <a href="http://www.atdot.net/~ko1/pub/ContinuationFest-ruby.pdf">harmful</a> and were moved to the standard library. <code>Enumerator</code> was rewritten in C using fibers.</p>
 
 <h2>Fibers</h2>
 
-<p>In other languages, fiber is the name for a lightweight thread. In ruby, it is a coroutine. Why it&rsquo;s not named coroutine then, you might ask? Well, because fiber sounds better <a href="http://www.atdot.net/~ko1/pub/ContinuationFest-ruby.pdf">apparently</a>.</p>
+<p>In other languages, fiber is the name for a lightweight thread. In ruby, it is a coroutine. Why it&rsquo;s not named coroutine then, you might ask? Well, because fiber sounds better <a href="http://www.atdot.net/~ko1/pub/ContinuationFest-ruby.pdf">apparently</a>(Page 20).</p>
 
 <p>There are two types of coroutines: semicouroutune and coroutine. They only differ in the way they transfer control.</p>
 
@@ -86,7 +86,7 @@ I actually am
 
 <p>These coroutines called asmymetric, because there is fundamental asymmetry between caller and coroutine. <em>Resumed</em> by the caller, coroutine <strong>can&rsquo;t</strong> transfer control to any other coroutine, only to suspend itself and <em>yield</em> control back to the caller.</p>
 
-<p>This is the default mode for ruby fibers</p>
+<p>This is the default mode for ruby fibers.</p>
 
 <h3>Symmetric Coroutines</h3>
 
@@ -129,7 +129,8 @@ I actually am
 <span class="n">enumerator</span><span class="p">.</span><span class="nf">rewind</span>
 <span class="n">enumerator</span><span class="p">.</span><span class="nf">next</span>   <span class="c1"># =&gt; 1</span>
 </code></pre></div>
-<p>Yeah, I know. That example probably doesn&rsquo;t raise your eyebrows, except for the syntax, of course. I mean use <code>&lt;&lt;</code> to return control, really? There is an even more confusing alias for that &ndash; <code>yield</code>, which corresponds to <code>Fiber.yield</code>, but has nothing to do with ruby keyword <code>yield</code>.</p>
+<p>Yeah, I know. That example probably doesn&rsquo;t raise your eyebrows, except for the syntax, of course. I mean use <code>&lt;&lt;</code> to return control, really?
+By the way, there is an even more confusing alias for that &ndash; <code>yield</code>. It corresponds to <code>Fiber.yield</code>, but has nothing to do with ruby keyword <code>yield</code>.</p>
 
 <p>Anyway, let&rsquo;s see how it works.</p>
 
@@ -141,9 +142,9 @@ I actually am
 </ol>
 
 <p><code>Enumerator</code> allows you to do two types of iterations: internal and external.
- In daily life, we usually see enumerators as internal iterators. It is returned everytime you call <code>Enumerable</code> methods without any arguments and what allows you to chain those methods together: <code>each.with_index</code> etc.</p>
+ In daily life, we usually see enumerators as internal iterators. It is returned everytime you call <code>Enumerable</code> methods without any arguments and it allows you to chain those methods together: <code>each.with_index</code> etc.</p>
 
-<p>Additionally, you can use enumerator as an external iterator as shown in the example above. This construct is might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with <code>Enumerator</code> would also be more readable than trying to save the previous state yourself. Unfortunately, it&rsquo;s not a very popular method_(as laziness in ruby in general) and I couldn&rsquo;t find any good example in the wild 😞</p>
+<p>Additionally, you can use enumerator as an external iterator as shown in the example above. This construct is might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with <code>Enumerator</code> would also be more readable than saving the previous state yourself. Unfortunately, it&rsquo;s not a very popular method _(as laziness in ruby in general) and I couldn&rsquo;t find any good examples of it in the wild 😞</p>
 
 <h2>The Fun Part</h2>
 

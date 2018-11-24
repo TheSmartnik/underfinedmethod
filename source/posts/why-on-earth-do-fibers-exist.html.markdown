@@ -16,13 +16,13 @@ Now that you know the truth. Let's start from the beginning.
 
 ## A bit of history
 
-Back in ruby 1.8 [generator was implemented through continuations](https://github.com/ruby/ruby/blob/ruby_1_8_7/lib/generator.rb), little-known control structure inspired by Lisp. Continuations main use was again to make generators and programs that needed [backtracking](https://en.wikipedia.org/wiki/Backtracking): [ambiguous operator](http://www.randomhacks.net/2005/10/11/amb-operator/), for example. It has bugs,  unpredictable behavior and implemented only in CRuby. Very few understand what it is for and even fewer actually tried to use it.
+Back in ruby 1.8 [generator was implemented through continuations](https://github.com/ruby/ruby/blob/ruby_1_8_7/lib/generator.rb), little-known control structure inspired by Lisp. Continuations main use is again to make generators and programs that needed [backtracking:](https://en.wikipedia.org/wiki/Backtracking) [ambiguous operator](http://www.randomhacks.net/2005/10/11/amb-operator/), for example. It has bugs,  unpredictable behavior and implemented only in CRuby. Very few understand what it is for and even fewer actually tried to use it.
 
 Then, ruby 1.9 with YARV came along. Continuations became to be [harmful](http://www.atdot.net/~ko1/pub/ContinuationFest-ruby.pdf) and were moved to the standard library. `Enumerator` was rewritten in C using fibers.
 
 ## Fibers
 
-In other languages, fiber is the name for a lightweight thread. In ruby, it is a coroutine. Why it's not named coroutine then, you might ask? Well, because fiber sounds better [apparently](http://www.atdot.net/~ko1/pub/ContinuationFest-ruby.pdf).
+In other languages, fiber is the name for a lightweight thread. In ruby, it is a coroutine. Why it's not named coroutine then, you might ask? Well, because fiber sounds better [apparently](http://www.atdot.net/~ko1/pub/ContinuationFest-ruby.pdf)(Page 20).
 
 There are two types of coroutines: semicouroutune and coroutine. They only differ in the way they transfer control.
 
@@ -30,7 +30,7 @@ There are two types of coroutines: semicouroutune and coroutine. They only diffe
 
 These coroutines called asmymetric, because there is fundamental asymmetry between caller and coroutine. _Resumed_ by the caller, coroutine **can't** transfer control to any other coroutine, only to suspend itself and _yield_ control back to the caller.
 
-This is the default mode for ruby fibers
+This is the default mode for ruby fibers.
 
 ### Symmetric Coroutines
 
@@ -74,7 +74,8 @@ enumerator.rewind
 enumerator.next   # => 1
 ```
 
-Yeah, I know. That example probably doesn't raise your eyebrows, except for the syntax, of course. I mean use `<<` to return control, really? There is an even more confusing alias for that -- `yield`, which corresponds to `Fiber.yield`, but has nothing to do with ruby keyword `yield`.
+Yeah, I know. That example probably doesn't raise your eyebrows, except for the syntax, of course. I mean use `<<` to return control, really?
+By the way, there is an even more confusing alias for that -- `yield`. It corresponds to `Fiber.yield`, but has nothing to do with ruby keyword `yield`.
 
 Anyway, let's see how it works.
 
@@ -84,9 +85,9 @@ Anyway, let's see how it works.
 4. Go back to step .2
 
 `Enumerator` allows you to do two types of iterations: internal and external.
- In daily life, we usually see enumerators as internal iterators. It is returned everytime you call `Enumerable` methods without any arguments and what allows you to chain those methods together: `each.with_index` etc.
+ In daily life, we usually see enumerators as internal iterators. It is returned everytime you call `Enumerable` methods without any arguments and it allows you to chain those methods together: `each.with_index` etc.
 
-Additionally, you can use enumerator as an external iterator as shown in the example above. This construct is might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with `Enumerator` would also be more readable than trying to save the previous state yourself. Unfortunately, it's not a very popular method_(as laziness in ruby in general) and I couldn't find any good example in the wild 😞
+Additionally, you can use enumerator as an external iterator as shown in the example above. This construct is might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with `Enumerator` would also be more readable than saving the previous state yourself. Unfortunately, it's not a very popular method _(as laziness in ruby in general) and I couldn't find any good examples of it in the wild 😞
 
 
 ## The Fun Part

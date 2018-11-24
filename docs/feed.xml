@@ -14,7 +14,7 @@
     <link rel="alternate" href="https://thesmartnik.com/why-on-earth-do-fibers-exist.html"/>
     <id>https://thesmartnik.com/why-on-earth-do-fibers-exist.html</id>
     <published>2018-11-23T14:11:00Z</published>
-    <updated>2018-11-24T17:44:17Z</updated>
+    <updated>2018-11-24T17:58:37Z</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
@@ -30,13 +30,13 @@
 
 &lt;h2&gt;A bit of history&lt;/h2&gt;
 
-&lt;p&gt;Back in ruby 1.8 &lt;a href="https://github.com/ruby/ruby/blob/ruby_1_8_7/lib/generator.rb"&gt;generator was implemented through continuations&lt;/a&gt;, little-known control structure inspired by Lisp. Continuations main use was again to make generators and programs that needed &lt;a href="https://en.wikipedia.org/wiki/Backtracking"&gt;backtracking&lt;/a&gt;: &lt;a href="http://www.randomhacks.net/2005/10/11/amb-operator/"&gt;ambiguous operator&lt;/a&gt;, for example. It has bugs,  unpredictable behavior and implemented only in CRuby. Very few understand what it is for and even fewer actually tried to use it.&lt;/p&gt;
+&lt;p&gt;Back in ruby 1.8 &lt;a href="https://github.com/ruby/ruby/blob/ruby_1_8_7/lib/generator.rb"&gt;generator was implemented through continuations&lt;/a&gt;, little-known control structure inspired by Lisp. Continuations main use is again to make generators and programs that needed &lt;a href="https://en.wikipedia.org/wiki/Backtracking"&gt;backtracking:&lt;/a&gt; &lt;a href="http://www.randomhacks.net/2005/10/11/amb-operator/"&gt;ambiguous operator&lt;/a&gt;, for example. It has bugs,  unpredictable behavior and implemented only in CRuby. Very few understand what it is for and even fewer actually tried to use it.&lt;/p&gt;
 
 &lt;p&gt;Then, ruby 1.9 with YARV came along. Continuations became to be &lt;a href="http://www.atdot.net/~ko1/pub/ContinuationFest-ruby.pdf"&gt;harmful&lt;/a&gt; and were moved to the standard library. &lt;code&gt;Enumerator&lt;/code&gt; was rewritten in C using fibers.&lt;/p&gt;
 
 &lt;h2&gt;Fibers&lt;/h2&gt;
 
-&lt;p&gt;In other languages, fiber is the name for a lightweight thread. In ruby, it is a coroutine. Why it&amp;rsquo;s not named coroutine then, you might ask? Well, because fiber sounds better &lt;a href="http://www.atdot.net/~ko1/pub/ContinuationFest-ruby.pdf"&gt;apparently&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In other languages, fiber is the name for a lightweight thread. In ruby, it is a coroutine. Why it&amp;rsquo;s not named coroutine then, you might ask? Well, because fiber sounds better &lt;a href="http://www.atdot.net/~ko1/pub/ContinuationFest-ruby.pdf"&gt;apparently&lt;/a&gt;(Page 20).&lt;/p&gt;
 
 &lt;p&gt;There are two types of coroutines: semicouroutune and coroutine. They only differ in the way they transfer control.&lt;/p&gt;
 
@@ -44,7 +44,7 @@
 
 &lt;p&gt;These coroutines called asmymetric, because there is fundamental asymmetry between caller and coroutine. &lt;em&gt;Resumed&lt;/em&gt; by the caller, coroutine &lt;strong&gt;can&amp;rsquo;t&lt;/strong&gt; transfer control to any other coroutine, only to suspend itself and &lt;em&gt;yield&lt;/em&gt; control back to the caller.&lt;/p&gt;
 
-&lt;p&gt;This is the default mode for ruby fibers&lt;/p&gt;
+&lt;p&gt;This is the default mode for ruby fibers.&lt;/p&gt;
 
 &lt;h3&gt;Symmetric Coroutines&lt;/h3&gt;
 
@@ -87,7 +87,8 @@
 &lt;span class="n"&gt;enumerator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;rewind&lt;/span&gt;
 &lt;span class="n"&gt;enumerator&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; 1&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Yeah, I know. That example probably doesn&amp;rsquo;t raise your eyebrows, except for the syntax, of course. I mean use &lt;code&gt;&amp;lt;&amp;lt;&lt;/code&gt; to return control, really? There is an even more confusing alias for that &amp;ndash; &lt;code&gt;yield&lt;/code&gt;, which corresponds to &lt;code&gt;Fiber.yield&lt;/code&gt;, but has nothing to do with ruby keyword &lt;code&gt;yield&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Yeah, I know. That example probably doesn&amp;rsquo;t raise your eyebrows, except for the syntax, of course. I mean use &lt;code&gt;&amp;lt;&amp;lt;&lt;/code&gt; to return control, really?
+By the way, there is an even more confusing alias for that &amp;ndash; &lt;code&gt;yield&lt;/code&gt;. It corresponds to &lt;code&gt;Fiber.yield&lt;/code&gt;, but has nothing to do with ruby keyword &lt;code&gt;yield&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Anyway, let&amp;rsquo;s see how it works.&lt;/p&gt;
 
@@ -99,9 +100,9 @@
 &lt;/ol&gt;
 
 &lt;p&gt;&lt;code&gt;Enumerator&lt;/code&gt; allows you to do two types of iterations: internal and external.
- In daily life, we usually see enumerators as internal iterators. It is returned everytime you call &lt;code&gt;Enumerable&lt;/code&gt; methods without any arguments and what allows you to chain those methods together: &lt;code&gt;each.with_index&lt;/code&gt; etc.&lt;/p&gt;
+ In daily life, we usually see enumerators as internal iterators. It is returned everytime you call &lt;code&gt;Enumerable&lt;/code&gt; methods without any arguments and it allows you to chain those methods together: &lt;code&gt;each.with_index&lt;/code&gt; etc.&lt;/p&gt;
 
-&lt;p&gt;Additionally, you can use enumerator as an external iterator as shown in the example above. This construct is might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with &lt;code&gt;Enumerator&lt;/code&gt; would also be more readable than trying to save the previous state yourself. Unfortunately, it&amp;rsquo;s not a very popular method_(as laziness in ruby in general) and I couldn&amp;rsquo;t find any good example in the wild 😞&lt;/p&gt;
+&lt;p&gt;Additionally, you can use enumerator as an external iterator as shown in the example above. This construct is might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with &lt;code&gt;Enumerator&lt;/code&gt; would also be more readable than saving the previous state yourself. Unfortunately, it&amp;rsquo;s not a very popular method _(as laziness in ruby in general) and I couldn&amp;rsquo;t find any good examples of it in the wild 😞&lt;/p&gt;
 
 &lt;h2&gt;The Fun Part&lt;/h2&gt;
 
