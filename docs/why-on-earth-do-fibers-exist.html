@@ -144,7 +144,7 @@ By the way, there is an even more confusing alias for that &ndash; <code>yield</
 <p><code>Enumerator</code> allows you to do two types of iterations: internal and external.
  In daily life, we usually see enumerators as internal iterators. It is returned everytime you call <code>Enumerable</code> methods without any arguments and it allows you to chain those methods together: <code>each.with_index</code> etc.</p>
 
-<p>Additionally, you can use enumerator as an external iterator as shown in the example above. This construct is might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with <code>Enumerator</code> would also be more readable than saving the previous state yourself. Unfortunately, it&rsquo;s not a very popular method _(as laziness in ruby in general) and I couldn&rsquo;t find any good examples of it in the wild 😞</p>
+<p>Additionally, you can use enumerator as an external iterator as shown in the example above. This construct might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with <code>Enumerator</code> would also be more readable than saving the previous state yourself. Unfortunately, it&rsquo;s not a very popular method <em>(as laziness in ruby in general)</em> and I couldn&rsquo;t find any good examples of it in the wild 😞</p>
 
 <h2>The Fun Part</h2>
 

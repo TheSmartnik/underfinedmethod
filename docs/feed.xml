@@ -14,7 +14,7 @@
     <link rel="alternate" href="https://thesmartnik.com/why-on-earth-do-fibers-exist.html"/>
     <id>https://thesmartnik.com/why-on-earth-do-fibers-exist.html</id>
     <published>2018-11-23T14:11:00Z</published>
-    <updated>2018-11-24T17:58:37Z</updated>
+    <updated>2018-11-26T12:09:41Z</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
@@ -102,7 +102,7 @@ By the way, there is an even more confusing alias for that &amp;ndash; &lt;code&
 &lt;p&gt;&lt;code&gt;Enumerator&lt;/code&gt; allows you to do two types of iterations: internal and external.
  In daily life, we usually see enumerators as internal iterators. It is returned everytime you call &lt;code&gt;Enumerable&lt;/code&gt; methods without any arguments and it allows you to chain those methods together: &lt;code&gt;each.with_index&lt;/code&gt; etc.&lt;/p&gt;
 
-&lt;p&gt;Additionally, you can use enumerator as an external iterator as shown in the example above. This construct is might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with &lt;code&gt;Enumerator&lt;/code&gt; would also be more readable than saving the previous state yourself. Unfortunately, it&amp;rsquo;s not a very popular method _(as laziness in ruby in general) and I couldn&amp;rsquo;t find any good examples of it in the wild 😞&lt;/p&gt;
+&lt;p&gt;Additionally, you can use enumerator as an external iterator as shown in the example above. This construct might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with &lt;code&gt;Enumerator&lt;/code&gt; would also be more readable than saving the previous state yourself. Unfortunately, it&amp;rsquo;s not a very popular method &lt;em&gt;(as laziness in ruby in general)&lt;/em&gt; and I couldn&amp;rsquo;t find any good examples of it in the wild 😞&lt;/p&gt;
 
 &lt;h2&gt;The Fun Part&lt;/h2&gt;
 

@@ -87,7 +87,7 @@ Anyway, let's see how it works.
 `Enumerator` allows you to do two types of iterations: internal and external.
  In daily life, we usually see enumerators as internal iterators. It is returned everytime you call `Enumerable` methods without any arguments and it allows you to chain those methods together: `each.with_index` etc.
 
-Additionally, you can use enumerator as an external iterator as shown in the example above. This construct is might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with `Enumerator` would also be more readable than saving the previous state yourself. Unfortunately, it's not a very popular method _(as laziness in ruby in general) and I couldn't find any good examples of it in the wild 😞
+Additionally, you can use enumerator as an external iterator as shown in the example above. This construct might be useful for heavy computations, where saving the previous state would save a lot of time and doing so with `Enumerator` would also be more readable than saving the previous state yourself. Unfortunately, it's not a very popular method _(as laziness in ruby in general)_ and I couldn't find any good examples of it in the wild 😞
 
 
 ## The Fun Part
