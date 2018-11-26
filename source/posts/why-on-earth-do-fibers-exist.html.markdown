@@ -159,3 +159,13 @@ generator.next    # => 1
 For a long time, I couldn't understand why fibers exist. I thought there was something special about them, something that I just couldn't grasp. Turned out there wasn't. They are very specific things, created for a very specific task.
 
 I hope that this article gave you a better understanding of what `Fiber` is, what it's not and how it's used.
+
+## Update about concurrency
+
+Remember that fibers in ruby have two mods? I haven't really talked about fibers as symmetric coroutines and one redditor [pointed that out](https://www.reddit.com/r/ruby/comments/a0ivny/why_on_earth_do_fibers_exist/eai2k67/).
+
+Given an ability to transfer control between one another, fibers can be used to write asynchronous concurrent code. To do this you'll need a library that implements event loop such as [async](https://github.com/socketry/async) or [eventmachine](https://github.com/eventmachine/eventmachine) or you can even build your own simple reactor with ruby `io/nonblock`.
+
+When it is useful? In tasks that require a lot of io such as web requests. There are two great examples of this: [goliath](https://github.com/postrank-labs/goliath) webserver that uses `eventmachine` and [falcon](https://github.com/socketry/falcon) build on top of the `async`.
+
+I tried to give a brief explanation here, so nothing was left out and you had a complete picture. While it's not in depth look at fibers as means for concurrency, I hope you now better understand how they can be utilized.

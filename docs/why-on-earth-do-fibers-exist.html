@@ -211,6 +211,16 @@ By the way, there is an even more confusing alias for that &ndash; <code>yield</
 
 <p>I hope that this article gave you a better understanding of what <code>Fiber</code> is, what it&rsquo;s not and how it&rsquo;s used.</p>
 
+<h2>Update about concurrency</h2>
+
+<p>Remember that fibers in ruby have two mods? I haven&rsquo;t really talked about fibers as symmetric coroutines and one redditor <a href="https://www.reddit.com/r/ruby/comments/a0ivny/why_on_earth_do_fibers_exist/eai2k67/">pointed that out</a>.</p>
+
+<p>Given an ability to transfer control between one another, fibers can be used to write asynchronous concurrent code. To do this you&rsquo;ll need a library that implements event loop such as <a href="https://github.com/socketry/async">async</a> or <a href="https://github.com/eventmachine/eventmachine">eventmachine</a> or you can even build your own simple reactor with ruby <code>io/nonblock</code>.</p>
+
+<p>When it is useful? In tasks that require a lot of io such as web requests. There are two great examples of this: <a href="https://github.com/postrank-labs/goliath">goliath</a> webserver that uses <code>eventmachine</code> and <a href="https://github.com/socketry/falcon">falcon</a> build on top of the <code>async</code>.</p>
+
+<p>I tried to give a brief explanation here, so nothing was left out and you had a complete picture. While it&rsquo;s not in depth look at fibers as means for concurrency, I hope you now better understand how they can be utilized. </p>
+
 </div>
 </div>
 <h3 class='mt-5'>Read Next:</h3>
