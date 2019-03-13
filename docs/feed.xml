@@ -14,11 +14,15 @@
     <link rel="alternate" href="https://thesmartnik.com/about-ruby-certification.html"/>
     <id>https://thesmartnik.com/about-ruby-certification.html</id>
     <published>2019-02-28T13:21:00Z</published>
-    <updated>2019-03-13T14:55:01Z</updated>
+    <updated>2019-03-13T18:35:23Z</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
-    <content type="html">&lt;h1&gt;Intro&lt;/h1&gt;
+    <content type="html">&lt;h1&gt;Disclaimer&lt;/h1&gt;
+
+&lt;p&gt;One reddit user &lt;a href="https://www.reddit.com/r/ruby/comments/b0n18j/about_ruby_certification/eifqnth/"&gt;suggested&lt;/a&gt; that it&amp;rsquo;s an advertisement blogpost. It&amp;rsquo;s not. I just wanted to provide some information for those who are interested and also raise general awareness about the topic. &lt;/p&gt;
+
+&lt;h1&gt;Intro&lt;/h1&gt;
 
 &lt;p&gt;Ruby has an official certification provided by Ruby Association, chairman of which is Yukihiro Matsumoto.
 I can&amp;rsquo;t say for Japan, but in the rest of the world, it&amp;rsquo;s not very popular. Either it&amp;rsquo;s because Ruby is a community-driven language,

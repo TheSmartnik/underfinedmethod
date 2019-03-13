@@ -6,6 +6,10 @@ tags:
 
 ---
 
+# Disclaimer
+
+One reddit user [suggested](https://www.reddit.com/r/ruby/comments/b0n18j/about_ruby_certification/eifqnth/) that it's an advertisement blogpost. It's not. I just wanted to provide some information for those who are interested and also raise general awareness about the topic.
+
 # Intro
 
 Ruby has an official certification provided by Ruby Association, chairman of which is Yukihiro Matsumoto.
