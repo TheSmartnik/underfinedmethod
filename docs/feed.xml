@@ -5,16 +5,104 @@
   <id>https://thesmartnik.com/</id>
   <link href="https://thesmartnik.com/"/>
   <link href="https://thesmartnik.com/feed.xml" rel="self"/>
-  <updated>2018-11-23T14:11:00Z</updated>
+  <updated>2019-02-28T13:21:00Z</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>About Ruby Certification</title>
+    <link rel="alternate" href="https://thesmartnik.com/about-ruby-certification.html"/>
+    <id>https://thesmartnik.com/about-ruby-certification.html</id>
+    <published>2019-02-28T13:21:00Z</published>
+    <updated>2019-03-13T14:55:01Z</updated>
+    <author>
+      <name>Mikita Misharin</name>
+    </author>
+    <content type="html">&lt;h1&gt;Intro&lt;/h1&gt;
+
+&lt;p&gt;Ruby has an official certification provided by Ruby Association, chairman of which is Yukihiro Matsumoto.
+I can&amp;rsquo;t say for Japan, but in the rest of the world, it&amp;rsquo;s not very popular. Either it&amp;rsquo;s because Ruby is a community-driven language,
+where the knowledge and achievements of an individual programmer are characterized by his or her contributions to Open Source and work experience. Maybe it&amp;rsquo;s because Ruby Association doesn&amp;rsquo;t do anything to promote it. Most of the pages on the official website are in Japanese and you can hardly find any resources on the web on how or why you should take it.&lt;/p&gt;
+
+&lt;p&gt;A few months ago, inspired by Egor Bugayenko&amp;rsquo;s &lt;a href="https://www.yegor256.com/2014/10/29/how-much-do-you-cost.html#certifications"&gt;article&lt;/a&gt; and &lt;a href="https://www.youtube.com/watch?v=SXd_Ccta1c8"&gt;talk&lt;/a&gt; about programmers worth &lt;em&gt;(a provoking theme and title for sure, but it&amp;rsquo;s nevertheless very useful)&lt;/em&gt;, I&amp;rsquo;ve decided to take the ruby certification. The following article is a summary of my experience.&lt;/p&gt;
+
+&lt;h1&gt;About the Certification&lt;/h1&gt;
+
+&lt;p&gt;Currently, Ruby certification consists of two tests: silver and gold. Another one, platinum is still in development. You&amp;rsquo;ll have 90 minutes to answer 50 multiple choice questions. A passing score is 75% and wrong answers don&amp;rsquo;t affect it, which means you have to answer correctly at least 38 questions.&lt;/p&gt;
+
+&lt;p&gt;Tests cost $100 each and are taken in Prometric test centers. They are located all around the world, so there shouldn&amp;rsquo;t be any problem to find one in your area. Right after the completion, you’ll get the results and in a week a digital certificate will be emailed to you.&lt;/p&gt;
+
+&lt;p&gt;Here is how certificates look: &lt;a href="https://www.credential.net/k6zuqudp"&gt;Silver&lt;/a&gt;/&lt;a href="https://www.credential.net/s0bd99gu"&gt;Gold&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1&gt;Hey, why do I need to take the certification, again?&lt;/h1&gt;
+
+&lt;p&gt;Before taking the certification I was quite suspicious about it and had a few questions:&lt;/p&gt;
+
+&lt;h3&gt;Can it really tell if I know Ruby well?&lt;/h3&gt;
+
+&lt;p&gt;I&amp;rsquo;d say that both tests are good at what they aim to do. As you&amp;rsquo;ll see later, questions aren&amp;rsquo;t simple. They test variety of different aspects of ruby both in wide and depth.&lt;/p&gt;
+
+&lt;h3&gt;Aren&amp;rsquo;t it&amp;rsquo;s just an enterprise thing to make your CV look shiny?&lt;/h3&gt;
+
+&lt;p&gt;Well, your CV will look shinier. And you&amp;rsquo;ll be also able to say that you&amp;rsquo;re certified ruby developer.&lt;/p&gt;
+
+&lt;h3&gt;But will anyone actually care?&lt;/h3&gt;
+
+&lt;p&gt;I don&amp;rsquo;t know. Probably not, but I learned a lot during preparation. So, I&amp;rsquo;d say it was worthwhile.&lt;/p&gt;
+
+&lt;h1&gt;Preparation&lt;/h1&gt;
+
+&lt;h2&gt;Silver&lt;/h2&gt;
+
+&lt;p&gt;Silver test covers the basics of ruby. Some basic edge cases of syntax. And not so well known methods of most popular classes. They may not appear in your day to day work, but you&amp;rsquo;ll definitely encounter them sooner or later.&lt;/p&gt;
+
+&lt;p&gt;I can&amp;rsquo;t really write the exact questions, but here is an example to give you an idea:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Let&amp;rsquo;s suppose you&amp;rsquo;ve defined a constant, what will happen if you try to redefine it?&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;In real life, you won&amp;rsquo;t ever need to change constant &lt;em&gt;(I mean, that what constant means, right?)&lt;/em&gt;. In ruby, however, you &lt;strong&gt;can&lt;/strong&gt; change it. So, even though it&amp;rsquo;s not very useful, it&amp;rsquo;s a good thing to know how your tools work and behave.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://www.ruby.or.jp/en/certification/examination/"&gt;Ruby certification site&lt;/a&gt; has a list of topics that tests cover. In my opinion, It&amp;rsquo;s rather broad and unclear. So for actual questions, you need to look at a prep test.&lt;/p&gt;
+
+&lt;p&gt;There are two prep tests you can use. One can be found on &lt;a href="https://www.ruby.or.jp/assets/images/en/certification/exam_prep_en.pdf"&gt;Ruby Association website&lt;/a&gt; &lt;em&gt;(it&amp;rsquo;s an old version with only 45 questions, but is still helpful)&lt;/em&gt; and one on &lt;a href="https://github.com/ruby-association/prep-test/blob/master/silver.md"&gt;github&lt;/a&gt;. These tests are really good, they provide an explanation to answers and show you &lt;strong&gt;exactly&lt;/strong&gt; what would you expect during an actual test.&lt;/p&gt;
+
+&lt;p&gt;I suggest you to take prep tests and if you find out that you scored 85-90%, you are all set and ready for the test. During the certification, my score was just a little below the prep one &lt;em&gt;(5-7%)&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h3&gt;What if you don&amp;rsquo;t want to take the test?&lt;/h3&gt;
+
+&lt;p&gt;If you don&amp;rsquo;t believe in certifications or just don&amp;rsquo;t want to spend $100, I still encourage you to take a prep test. It&amp;rsquo;s a great learning material. It will show you the gaps in your knowledge and generally a really fun thing to do.&lt;/p&gt;
+
+&lt;p&gt;One more thing. If you conduct an interview and not really sure what questions to ask. Pick a few from the tests. They are good 👌&lt;/p&gt;
+
+&lt;h2&gt;Gold&lt;/h2&gt;
+
+&lt;p&gt;That&amp;rsquo;s a trickier one. It has lot&amp;rsquo;s of questions on completely different topics: &lt;a href="why-on-earth-do-fibers-exist.html"&gt;Fibers&lt;/a&gt;, meta programming, &lt;a href="what-protected-actually-does.html"&gt;method visibility modifiers&lt;/a&gt;, exceptions, exception ancestry chain, catch/throw, use of Enumerable and Comparable, Refinements.&lt;/p&gt;
+
+&lt;p&gt;A few books I&amp;rsquo;ve read previously that were of great help during the test are &lt;a href="http://exceptionalruby.com/"&gt;Exceptional Ruby&lt;/a&gt;, &lt;a href="http://www.confidentruby.com/"&gt;Confident Ruby&lt;/a&gt;, &lt;a href="https://pragprog.com/book/ppmetr2/metaprogramming-ruby-2"&gt;Metaprogramming Ruby&lt;/a&gt;. If you haven&amp;rsquo;t read these, I encourage you to. Even if you don&amp;rsquo;t plan to take the test. These are generally really good Ruby books that will boost your understanding and knowledge of the language.&lt;/p&gt;
+
+&lt;p&gt;As a silver test, gold one also has &lt;a href="https://github.com/ruby-association/prep-test/blob/master/gold.md"&gt;a prep test&lt;/a&gt;, but it doesn&amp;rsquo;t contain the full range of questions you&amp;rsquo;ll face during an official examination. So take prep test, see where your gaps are and study them carefully.&lt;/p&gt;
+
+&lt;p&gt;Overall, Gold Certification is a lot more fun, challenging and rewarding experience.&lt;/p&gt;
+
+&lt;h1&gt;Registration&lt;/h1&gt;
+
+&lt;p&gt;When you&amp;rsquo;re ready to take a test. Time for registration. Just go to a &lt;a href="https://www.prometric.com/en-us/clients/ruby/Pages/landing.aspx"&gt;Prometric website&lt;/a&gt;, choose the certification you want, and book your time and place.&lt;/p&gt;
+
+&lt;p&gt;And that&amp;rsquo;s it. All you&amp;rsquo;ll need now is to arrive at the test center at a chosen date and take the test.&lt;/p&gt;
+
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;In the end, I’m glad I took the certification. I learned a lot along the way and it’s so fun to discover new things in tools you’ve known for years. Some things I’ve learned I’ll only need in job interviews, but some are very helpful and I started to use in my code right away.&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>Why on earth do fibers exist?</title>
     <link rel="alternate" href="https://thesmartnik.com/why-on-earth-do-fibers-exist.html"/>
     <id>https://thesmartnik.com/why-on-earth-do-fibers-exist.html</id>
     <published>2018-11-23T14:11:00Z</published>
-    <updated>2018-11-26T21:08:18Z</updated>
+    <updated>2018-11-26T21:08:52Z</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
@@ -177,7 +265,7 @@ By the way, there is an even more confusing alias for that &amp;ndash; &lt;code&
 
 &lt;p&gt;When it is useful? In tasks that require a lot of io such as web requests. There are two great examples of this: &lt;a href="https://github.com/postrank-labs/goliath"&gt;goliath&lt;/a&gt; webserver that uses &lt;code&gt;eventmachine&lt;/code&gt; and &lt;a href="https://github.com/socketry/falcon"&gt;falcon&lt;/a&gt; build on top of the &lt;code&gt;async&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;I tried to give a brief explanation here, so nothing was left out and you had a complete picture. While it&amp;rsquo;s not in depth look at fibers as means for concurrency, I hope you now better understand how they can be utilized. &lt;/p&gt;
+&lt;p&gt;I tried to give a brief explanation here, so nothing was left out and you had a complete picture. While it&amp;rsquo;s not in depth look at fibers as means for concurrency, I hope you now better understand how they can be utilized.&lt;/p&gt;
 </content>
   </entry>
   <entry>
