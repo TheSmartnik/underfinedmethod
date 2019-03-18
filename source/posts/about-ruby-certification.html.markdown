@@ -22,7 +22,7 @@ A few months ago, inspired by Egor Bugayenko's [article](https://www.yegor256.co
 
 Currently, Ruby certification consists of two tests: silver and gold. Another one, platinum is still in development. You'll have 90 minutes to answer 50 multiple choice questions. A passing score is 75% and wrong answers don't affect it, which means you have to answer correctly at least 38 questions.
 
-Tests cost $100 each and are taken in Prometric test centers. They are located all around the world, so there shouldn't be any problem to find one in your area. Right after the completion, you’ll get the results and in a week a digital certificate will be emailed to you.
+Tests cost $150 each and are taken in Prometric test centers. They are located all around the world, so there shouldn't be any problem to find one in your area. Right after the completion, you’ll get the results and in a week a digital certificate will be emailed to you.
 
 Here is how certificates look: [Silver](https://www.credential.net/k6zuqudp)/[Gold](https://www.credential.net/s0bd99gu)
 
@@ -62,7 +62,7 @@ I suggest you to take prep tests and if you find out that you scored 85-90%, you
 
 ### What if you don't want to take the test?
 
-If you don't believe in certifications or just don't want to spend $100, I still encourage you to take a prep test. It's a great learning material. It will show you the gaps in your knowledge and generally a really fun thing to do.
+If you don't believe in certifications or just don't want to spend $150, I still encourage you to take a prep test. It's a great learning material. It will show you the gaps in your knowledge and generally a really fun thing to do.
 
 One more thing. If you conduct an interview and not really sure what questions to ask. Pick a few from the tests. They are good 👌
 
