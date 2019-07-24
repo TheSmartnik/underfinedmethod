@@ -2,7 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://thesmartnik.com/why-on-earth-do-fibers-exist.html</loc>
-    <lastmod>2018-11-26T21:08:52Z</lastmod>
+    <lastmod>2019-07-04T06:37:13Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://thesmartnik.com/breaking-apart-inheritable-mattr_accessors-in-httparty.html</loc>
+    <lastmod>2019-07-24T10:06:15Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -14,7 +20,7 @@
   </url>
   <url>
     <loc>https://thesmartnik.com/about-ruby-certification.html</loc>
-    <lastmod>2019-03-18T21:42:20Z</lastmod>
+    <lastmod>2019-07-17T03:53:17Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

@@ -5,10 +5,152 @@
   <id>https://thesmartnik.com/</id>
   <link href="https://thesmartnik.com/"/>
   <link href="https://thesmartnik.com/feed.xml" rel="self"/>
-  <updated>2019-02-28T13:21:00Z</updated>
+  <updated>2019-07-04T20:42:00Z</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Breaking apart inheritable mattr_accessors in HTTParty</title>
+    <link rel="alternate" href="https://thesmartnik.com/breaking-apart-inheritable-mattr_accessors-in-httparty.html"/>
+    <id>https://thesmartnik.com/breaking-apart-inheritable-mattr_accessors-in-httparty.html</id>
+    <published>2019-07-04T20:42:00Z</published>
+    <updated>2019-07-24T10:06:15Z</updated>
+    <author>
+      <name>Mikita Misharin</name>
+    </author>
+    <content type="html">&lt;h1&gt;A land of sharp of knives&lt;/h1&gt;
+
+&lt;p&gt;We all know that Ruby provides you with &lt;a href="https://m.signalvnoise.com/provide-sharp-knives/"&gt;sharp knives&lt;/a&gt;. Used with caution they give you great power, but misuse them and you will be remembered at your job long after.&lt;/p&gt;
+
+&lt;p&gt;I like some of those, from outside they look like magic, but inside they often are incomprehensible and hard to debug metaprogramming mess.&lt;/p&gt;
+
+&lt;p&gt;And in this post, I want to dig into one of those: inheritable attr_accessors.&lt;/p&gt;
+
+&lt;h1&gt;A little background&lt;/h1&gt;
+
+&lt;p&gt;A conventional use of &lt;code&gt;HTTParty&lt;/code&gt; is to &lt;code&gt;include&lt;/code&gt; it in your &lt;code&gt;class&lt;/code&gt;. It allows to create nice and simple wrappers around almost any API and perfect for little API gems. Something like.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;ApiClient&lt;/span&gt;
+  &lt;span class="kp"&gt;include&lt;/span&gt; &lt;span class="no"&gt;HTTParty&lt;/span&gt;
+
+  &lt;span class="n"&gt;base_uri&lt;/span&gt; &lt;span class="s2"&gt;"example.com"&lt;/span&gt;
+
+  &lt;span class="n"&gt;headers&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;content_type: &lt;/span&gt;&lt;span class="s1"&gt;'application/json'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;clients&lt;/span&gt;
+    &lt;span class="n"&gt;get&lt;/span&gt; &lt;span class="ss"&gt;:clients&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;But what if wanted to inherit from &lt;code&gt;ApiClient&lt;/code&gt;? The obvious behavior would be for a child class to inherit parent&amp;rsquo;s class-defined options.&lt;/p&gt;
+
+&lt;p&gt;As you might have already guessed, there is no straightforward way to do this.&lt;/p&gt;
+
+&lt;h1&gt;Here comes the dragon&lt;/h1&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;    &lt;span class="k"&gt;module&lt;/span&gt; &lt;span class="nn"&gt;ModuleInheritableAttributes&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nc"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;included&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;base&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;base&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;extend&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;ClassMethods&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+
+    &lt;span class="k"&gt;module&lt;/span&gt; &lt;span class="nn"&gt;ClassMethods&lt;/span&gt;
+      &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;mattr_inheritable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="vi"&gt;@mattr_inheritable_attrs&lt;/span&gt; &lt;span class="o"&gt;||=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="ss"&gt;:mattr_inheritable_attrs&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+        &lt;span class="vi"&gt;@mattr_inheritable_attrs&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;
+
+        &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+          &lt;span class="nb"&gt;module_eval&lt;/span&gt; &lt;span class="sx"&gt;%(class &amp;lt;&amp;lt; self; attr_accessor :#{arg} end)&lt;/span&gt;
+        &lt;span class="k"&gt;end&lt;/span&gt;
+      &lt;span class="k"&gt;end&lt;/span&gt;
+
+      &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;inherited&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;subclass&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;super&lt;/span&gt;
+        &lt;span class="vi"&gt;@mattr_inheritable_attrs&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;inheritable_attribute&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+          &lt;span class="n"&gt;ivar&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"@&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;inheritable_attribute&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;
+          &lt;span class="n"&gt;parent_value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;instance_variable_get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ivar&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nf"&gt;clone&lt;/span&gt;
+          &lt;span class="n"&gt;subclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;instance_variable_set&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ivar&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;parent_value&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+          &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;parent_value&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;respond_to?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;:merge&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="nb"&gt;method&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;-&lt;/span&gt;&lt;span class="no"&gt;EOM&lt;/span&gt;&lt;span class="sh"&gt;
+              def self.&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;inheritable_attribute&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sh"&gt;
+                 &lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;ivar&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sh"&gt; = superclass.&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;inheritable_attribute&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sh"&gt;.merge(Marshal.load(Marshal.dump(&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;ivar&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sh"&gt;)
+                 )
+              end
+&lt;/span&gt;&lt;span class="no"&gt;            EOM&lt;/span&gt;
+            &lt;span class="n"&gt;subclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class_eval&lt;/span&gt; &lt;span class="nb"&gt;method&lt;/span&gt;
+          &lt;span class="k"&gt;end&lt;/span&gt;
+        &lt;span class="k"&gt;end&lt;/span&gt;
+      &lt;span class="k"&gt;end&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;I modified a code a bit. Instead of &lt;code&gt;Marshal.load(Marshal.dump()&lt;/code&gt; we now use a &lt;code&gt;hash_deep_dup&lt;/code&gt; borrowed from &lt;code&gt;ActiveSupport&lt;/code&gt;. It makes code even more complex and not relevant to our discussion here, so I replaced it.&lt;/p&gt;
+
+&lt;p&gt;It&amp;rsquo;s then used like so&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;module&lt;/span&gt; &lt;span class="nn"&gt;HTTParty&lt;/span&gt;
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nc"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;included&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;base&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;base&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;include&lt;/span&gt; &lt;span class="no"&gt;ModuleInheritableAttributes&lt;/span&gt;
+    &lt;span class="n"&gt;base&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;mattr_inheritable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;default_options&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;base&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;instance_variable_set&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"@default_options"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{})&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;As you can see, use of the code is simple and easy. Code that achieves that, however&amp;hellip; Well it&amp;rsquo;s complex, to say the least.&lt;/p&gt;
+
+&lt;h1&gt;Let&amp;rsquo;s take a closer look to see how it works&lt;/h1&gt;
+
+&lt;h2&gt;mattr_inheritable&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;mattr_inheritable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="vi"&gt;@mattr_inheritable_attrs&lt;/span&gt; &lt;span class="o"&gt;||=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="ss"&gt;:mattr_inheritable_attrs&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+  &lt;span class="vi"&gt;@mattr_inheritable_attrs&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;
+
+  &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+    &lt;span class="nb"&gt;module_eval&lt;/span&gt; &lt;span class="sx"&gt;%(class &amp;lt;&amp;lt; self; attr_accessor :#{arg} end)&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;ol&gt;
+&lt;li&gt;Initializing a &lt;em&gt;class instance variable&lt;/em&gt; to hold our inheritable attributes including the variable itself.&lt;/li&gt;
+&lt;li&gt;Adding our new attribute to the array&lt;/li&gt;
+&lt;li&gt;Adding accesor to our &lt;strong&gt;module&lt;/strong&gt;. Notice &lt;code&gt;module_eval&lt;/code&gt; here, we evaluate our code in the context of the module. So we are adding accessor not to an instance, but to a module&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;inherited&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;inherited&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;subclass&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;super&lt;/span&gt;
+  &lt;span class="vi"&gt;@mattr_inheritable_attrs&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;inheritable_attribute&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+    &lt;span class="n"&gt;ivar&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"@&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;inheritable_attribute&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;
+    &lt;span class="n"&gt;parent_value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;instance_variable_get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ivar&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nf"&gt;clone&lt;/span&gt;
+    &lt;span class="n"&gt;subclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;instance_variable_set&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ivar&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;parent_value&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;parent_value&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;respond_to?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;:merge&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="nb"&gt;method&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;-&lt;/span&gt;&lt;span class="no"&gt;EOM&lt;/span&gt;&lt;span class="sh"&gt;
+        def self.&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;inheritable_attribute&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sh"&gt;
+           &lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;ivar&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sh"&gt; = superclass.&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;inheritable_attribute&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sh"&gt;.merge(Marshal.load(Marshal.dump(&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;ivar&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sh"&gt;)
+           )
+        end
+&lt;/span&gt;&lt;span class="no"&gt;      EOM&lt;/span&gt;
+      &lt;span class="n"&gt;subclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class_eval&lt;/span&gt; &lt;span class="nb"&gt;method&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;ol&gt;
+&lt;li&gt;Starting to iterate over our inheritable attributes&lt;/li&gt;
+&lt;li&gt;Getting variable value from parent&lt;/li&gt;
+&lt;li&gt;Setting the value to child &lt;/li&gt;
+&lt;li&gt;Checking the value respond to &lt;code&gt;#merge&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Here, with &lt;code&gt;class_eval&lt;/code&gt; we redefine our attr reader to always get parent values and then merge with them with values of a subclass. It&amp;rsquo;s needed for cases when parent options were changed &lt;em&gt;after&lt;/em&gt; our child class was evaluated.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;That&amp;rsquo;s it 😊&lt;/p&gt;
+
+&lt;h1&gt;A land of magic&lt;/h1&gt;
+
+&lt;p&gt;While reading this you might have thought: &amp;ldquo;God, what a mess!&amp;rdquo;. And that&amp;rsquo;s true, but it also allows for some clean code on the user&amp;rsquo;s side.&lt;/p&gt;
+
+&lt;p&gt;Whether &amp;ldquo;magic&amp;rdquo; is always bad is a controversial topic. Rails have been criticized for years because of it. However, it is also the reason why Rails became so popular in the first place. It&amp;rsquo;s the reason why many of us fell in love with Ruby.&lt;/p&gt;
+
+&lt;p&gt;So, as with every other decision in programming, there is always a trade-off one has to make. When you create a library your objective is to create an easy to use tool and for that, a little magic is sometimes necessary.&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>About Ruby Certification</title>
     <link rel="alternate" href="https://thesmartnik.com/about-ruby-certification.html"/>
