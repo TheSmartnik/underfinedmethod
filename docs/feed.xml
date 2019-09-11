@@ -14,7 +14,7 @@
     <link rel="alternate" href="https://thesmartnik.com/breaking-apart-inheritable-mattr_accessors-in-httparty.html"/>
     <id>https://thesmartnik.com/breaking-apart-inheritable-mattr_accessors-in-httparty.html</id>
     <published>2019-07-04T20:42:00Z</published>
-    <updated>2019-07-24T10:06:15Z</updated>
+    <updated>2019-09-11T10:35:25Z</updated>
     <author>
       <name>Mikita Misharin</name>
     </author>
@@ -149,7 +149,31 @@
 &lt;p&gt;Whether &amp;ldquo;magic&amp;rdquo; is always bad is a controversial topic. Rails have been criticized for years because of it. However, it is also the reason why Rails became so popular in the first place. It&amp;rsquo;s the reason why many of us fell in love with Ruby.&lt;/p&gt;
 
 &lt;p&gt;So, as with every other decision in programming, there is always a trade-off one has to make. When you create a library your objective is to create an easy to use tool and for that, a little magic is sometimes necessary.&lt;/p&gt;
-</content>
+
+&lt;h1&gt;Update 11.09.2019&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href="https://github.com/janko"&gt;Janko Marohnić&lt;/a&gt; kindly &lt;a href="https://www.reddit.com/r/ruby/comments/chiz4j/breaking_apart_inheritable_mattr_accessors_in/"&gt;suggested&lt;/a&gt; a refactored, simplified version of the code using &lt;a href="https://dejimata.com/2017/5/20/the-ruby-module-builder-pattern"&gt;module builder pattern&lt;/a&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;  &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;MattrInheritable&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="no"&gt;Module&lt;/span&gt; &lt;span class="c1"&gt;#:nodoc:&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;initialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;names&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="nb"&gt;attr_accessor&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;names&lt;/span&gt;
+
+      &lt;span class="n"&gt;define_method&lt;/span&gt; &lt;span class="ss"&gt;:inherited&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;subclass&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+        &lt;span class="n"&gt;names&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="nb"&gt;name&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+          &lt;span class="k"&gt;super&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;subclass&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+          &lt;span class="n"&gt;subclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;send&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;:"&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="nb"&gt;name&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="ss"&gt;="&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;send&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;name&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+          &lt;span class="n"&gt;subclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class_eval&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;-&lt;/span&gt;&lt;span class="no"&gt;RUBY&lt;/span&gt;&lt;span class="sh"&gt;
+            def self.&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="nb"&gt;name&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sh"&gt;
+              @&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="nb"&gt;name&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sh"&gt; = superclass.&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="nb"&gt;name&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sh"&gt;.merge(MattrInheritable.hash_deep_dup(@&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="nb"&gt;name&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sh"&gt;))
+            end
+&lt;/span&gt;&lt;span class="no"&gt;          RUBY&lt;/span&gt;
+        &lt;span class="k"&gt;end&lt;/span&gt;
+      &lt;span class="k"&gt;end&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;That can be used later used like so&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="n"&gt;base&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;extend&lt;/span&gt; &lt;span class="no"&gt;MattrInheritable&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;new&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;:default_options&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content>
   </entry>
   <entry>
     <title>About Ruby Certification</title>

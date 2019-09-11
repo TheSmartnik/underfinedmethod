@@ -148,3 +148,34 @@ While reading this you might have thought: "God, what a mess!". And that's true,
 Whether "magic" is always bad is a controversial topic. Rails have been criticized for years because of it. However, it is also the reason why Rails became so popular in the first place. It's the reason why many of us fell in love with Ruby.
 
 So, as with every other decision in programming, there is always a trade-off one has to make. When you create a library your objective is to create an easy to use tool and for that, a little magic is sometimes necessary.
+
+
+# Update 11.09.2019
+
+[Janko Marohnić](https://github.com/janko) kindly [suggested](https://www.reddit.com/r/ruby/comments/chiz4j/breaking_apart_inheritable_mattr_accessors_in/) a refactored, simplified version of the code using [module builder pattern](https://dejimata.com/2017/5/20/the-ruby-module-builder-pattern)
+
+```ruby
+  class MattrInheritable < Module #:nodoc:
+    def initialize(*names)
+      attr_accessor *names
+
+      define_method :inherited do |subclass|
+        names.each do |name|
+          super(subclass)
+          subclass.send(:"#{name}=", send(name))
+
+          subclass.class_eval <<-RUBY
+            def self.#{name}
+              @#{name} = superclass.#{name}.merge(MattrInheritable.hash_deep_dup(@#{name}))
+            end
+          RUBY
+        end
+      end
+    end
+  ```
+
+That can be used later used like so
+
+```ruby
+base.extend MattrInheritable.new(:default_options)
+```
