@@ -14,7 +14,7 @@ To quote [one book:](https://www.amazon.com/dp/0596516177)
 
 Now that you know the truth. Let's start from the beginning.
 
-## A bit of history
+## <a name="a-bit-of-history"></a> A bit of history
 
 Back in ruby 1.8 [generator was implemented through continuations](https://github.com/ruby/ruby/blob/ruby_1_8_7/lib/generator.rb), little-known control structure inspired by Lisp. Continuations main use is again to make generators and programs that needed [backtracking:](https://en.wikipedia.org/wiki/Backtracking) [ambiguous operator](http://www.randomhacks.net/2005/10/11/amb-operator/), for example. It has bugs,  unpredictable behavior and implemented only in CRuby. Very few understand what it is for and even fewer actually tried to use it.
 
