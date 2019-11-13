@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<meta charset='utf-8'>
+<meta content='IE=edge;chrome=1' http-equiv='X-UA-Compatible'>
+<meta content='width=device-width, initial-scale=1' name='viewport'>
+<title>
+Solving Puzzles with Amb | Write-only tech blog
+</title>
+<link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" />
+<link href="stylesheets/style.css" rel="stylesheet" />
+</head>
+<body>
+<div id='main' role='main'>
+<div class='container mt-5 mb-5'>
+<div class='row'>
+<div class='col-12 col-md-4 col-lg-3'>
+<a href="/"><img src="images/profile.jpg" class="rounded-circle mx-auto d-block image__profile" alt="Profile" />
+</a><div class='text-center'>
+<h4>
+<a href="/"><b>Nikita Misharin</b>
+</a></h4>
+<h5>
+<div class='small'>
+<svg class='icon__ruby text-center' viewBox='0 0 50 50'>
+<use xlink:href='images/ruby.svg#surface1'></use>
+</svg>
+<span class='title__developer'>
+Developer
+</span>
+</div>
+<div class='mt-3'>
+Writing stuff on the internet to appear smarter, than
+<br>
+I actually am
+</div>
+</h5>
+</div>
+<div class='row mt-3 mb-5'>
+<div class='col-4 text-center'>
+<a href="https://stackoverflow.com/users/4308435"><div class='icon__wrapper'>
+<img src="https://unpkg.com/simple-icons@latest/icons/stackoverflow.svg" class="icon__social" alt="Stackoverflow" />
+</div>
+</a></div>
+<div class='col-4 text-center'>
+<a href="https://github.com/TheSmartnik"><div class='icon__wrapper'>
+<img src="https://unpkg.com/simple-icons@latest/icons/github.svg" class="icon__social" alt="Github" />
+</div>
+</a></div>
+<div class='col-4 text-center'>
+<a href="feed.xml"><div class='icon__wrapper'>
+<img src="https://unpkg.com/simple-icons@latest/icons/rss.svg" class="icon__social" alt="Rss" />
+</div>
+</a></div>
+</div>
+</div>
+<div class='col-12 col-md-8 col-lg-9'>
+<div class='article rounded'>
+<div class='article-content'>
+<h1 class='mb-4'>Solving Puzzles with Amb</h1>
+<p>Ever since an article about fibers, I was curious about an amb operator. There are multiple articles explaining both what it is and how to implement it: <a href="http://www.randomhacks.net/2005/10/11/amb-operator/">Roseta Code</a> and <a href="http://www.randomhacks.net/2005/10/11/amb-operator/">Eric Kidd&rsquo;s blog</a>. There is even a <a href="https://github.com/chikamichi/amb">gem with two different implementations</a>. What&rsquo;s left unclear to me, though was how to solve problems with amb.</p>
+
+<p>I believe that the easiest way to understand something is to build it yourself and then try to explain it to others and that&rsquo;s exactly what I&rsquo;m doing now :)</p>
+
+<p>Recently, I&rsquo;ve solved a few classical problems using amb. The result turned out to be short, simple and declarative.</p>
+
+<h2>Disclaimer</h2>
+
+<p>The post turned out to be long, complex and code-heavy, but don&rsquo;t let it discourage you. Please, try some of the things below. Play around it with it. They are mindblowing. A <del>lisp</del> ruby magic at it&rsquo;s finest.</p>
+
+<h2>What exactly is amb and how it works</h2>
+
+<p>I really encourage you to read the articles I&rsquo;ve mentioned above. You will better understand how it works under the hood. However, if you decide not to, here is a basic principle:</p>
+
+<blockquote>
+<p>Given a set of constraints and options to choose from, <code>amb</code> returns options satisfied by those constraints.</p>
+</blockquote>
+
+<p>And a basic example:</p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="nb">require</span> <span class="s1">'amb'</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="c1"># options to choose from</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="c1"># options to choose from</span>
+
+<span class="n">amb</span> <span class="k">unless</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span> <span class="o">==</span> <span class="mi">8</span> <span class="c1"># constraint</span>
+
+<span class="nb">puts</span> <span class="s2">"x: </span><span class="si">#{</span><span class="n">x</span><span class="si">}</span><span class="s2">, y: </span><span class="si">#{</span><span class="n">y</span><span class="si">}</span><span class="s2">"</span>
+<span class="o">=&gt;</span> <span class="ss">x: </span><span class="mi">2</span><span class="p">,</span> <span class="ss">y: </span><span class="mi">4</span>
+</code></pre></div>
+<p>Here we first specify options for <code>x</code> and <code>y</code>.Then we call <code>amb</code> without parameter until their product equals 8.</p>
+
+<p>Why do we call <code>amb</code> without parameter? It&rsquo;s a gem API to try other options by using a ruby control-flow structure called <code>continuations</code>. It allows as to easily check possible combinations until we find the one that satisfies the constraints.</p>
+
+<h3>Wait wait wait&hellip; What is a continuation?</h3>
+
+<p>I&rsquo;ve mentioned them <a href="why-on-earth-do-fibers-exist.html#a-bit-of-history">before</a>, but without much explanation. The best way to describe <code>continuations</code> is through metaphor. If a program is a book, continuation would be a bookmark. Think of a goto, that can only go backward. Or using a famous sandwich example:</p>
+
+<blockquote>
+<p>Say you’re in the kitchen in front of the refrigerator, thinking about a sandwich. You take a continuation right there and stick it in your pocket. Then you get some turkey and bread out of the refrigerator and make yourself a sandwich, which is now sitting on the counter. You invoke the continuation in your pocket, and you find yourself standing in front of the refrigerator again, thinking about a sandwich. But fortunately, there’s a sandwich on the counter, and all the materials used to make it are gone. So you eat it. :-)</p>
+</blockquote>
+
+<h3>Back to amb</h3>
+
+<p>Ok, so what amb gives us? Ability to specify a set of constraints and the ability to go backward in program execution and check different combinations of options until those constraints are met. Let&rsquo;s see how it works in practice.</p>
+
+<hr>
+
+<h2>Note</h2>
+
+<ol>
+<li>In all of the examples, I use gem amb.</li>
+<li>Examples don&rsquo;t work in REPL, because irb/pry doesn&rsquo;t handle continuations.</li>
+</ol>
+
+<h2>Problem 1: SEND + MORE = MONEY</h2>
+
+<p>Here is a classical <a href="https://en.wikipedia.org/wiki/Verbal_arithmetic">cryptarithm</a>. We need to change every single letter in the equation <code>SEND + MORE = MONEY</code> with a number such that it holds true.</p>
+
+<h3>The first naïve solution</h3>
+
+<p>The first thing I tried to do was just declaratively put requirements into code, like so</p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="nb">require</span> <span class="s1">'amb'</span>
+<span class="kp">include</span> <span class="no">Amb</span><span class="o">::</span><span class="no">Operator</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+<span class="n">o</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">constraint</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="p">,</span> <span class="n">n</span> <span class="p">,</span> <span class="n">d</span> <span class="p">,</span> <span class="n">m</span> <span class="p">,</span> <span class="n">o</span> <span class="p">,</span> <span class="n">r</span> <span class="p">,</span> <span class="n">y</span><span class="p">].</span><span class="nf">uniq</span><span class="p">.</span><span class="nf">size</span> <span class="o">==</span> <span class="mi">8</span> <span class="o">&amp;&amp;</span> <span class="s2">"</span><span class="si">#{</span><span class="n">s</span><span class="si">}#{</span><span class="n">e</span><span class="si">}#{</span><span class="n">n</span><span class="si">}#{</span><span class="n">d</span><span class="si">}</span><span class="s2">"</span><span class="p">.</span><span class="nf">to_i</span> <span class="o">+</span> <span class="s2">"</span><span class="si">#{</span><span class="n">m</span><span class="si">}#{</span><span class="n">o</span><span class="si">}#{</span><span class="n">r</span><span class="si">}#{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">.</span><span class="nf">to_i</span> <span class="o">==</span> <span class="s2">"</span><span class="si">#{</span><span class="n">m</span><span class="si">}#{</span><span class="n">o</span><span class="si">}#{</span><span class="n">n</span><span class="si">}#{</span><span class="n">e</span><span class="si">}#{</span><span class="n">y</span><span class="si">}</span><span class="s2">"</span><span class="p">.</span><span class="nf">to_i</span>
+<span class="n">amb</span> <span class="k">unless</span> <span class="n">constraint</span>
+
+</code></pre></div>
+<p>As you can see, not very different from the basic example. Here we first specify options for every letter and then check that they are unique and equation holds true. Then we call <code>amb</code> without parameter until constraints are met.</p>
+
+<p>It turned out to work but had a serious problem: speed. The code above took 13 <em>minutes</em> on my machine.</p>
+
+<h3>Optimized solution</h3>
+
+<p>Here is where <a href="https://github.com/flash-gordon">Nikita Shilnikov</a> came to the rescue. He showed, how to specify unique constraints when declaring amb options. This drastically reduced number of combinations we need to check</p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="nb">require</span> <span class="s1">'amb'</span>
+<span class="kp">include</span> <span class="no">Amb</span><span class="o">::</span><span class="no">Operator</span>
+
+<span class="n">choices</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="mi">9</span><span class="p">).</span><span class="nf">to_a</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="o">*</span><span class="n">choices</span> <span class="o">-</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="o">*</span><span class="n">choices</span> <span class="o">-</span> <span class="p">[</span><span class="n">s</span><span class="p">])</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="o">*</span><span class="n">choices</span> <span class="o">-</span> <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">])</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="o">*</span><span class="n">choices</span> <span class="o">-</span> <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">])</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="o">*</span><span class="n">choices</span> <span class="o">-</span> <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">o</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="o">*</span><span class="n">choices</span> <span class="o">-</span> <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">])</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="o">*</span><span class="n">choices</span> <span class="o">-</span> <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">o</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="o">*</span><span class="n">choices</span> <span class="o">-</span> <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">r</span><span class="p">])</span>
+
+<span class="n">constraint</span> <span class="o">=</span> <span class="s2">"</span><span class="si">#{</span><span class="n">s</span><span class="si">}#{</span><span class="n">e</span><span class="si">}#{</span><span class="n">n</span><span class="si">}#{</span><span class="n">d</span><span class="si">}</span><span class="s2">"</span><span class="p">.</span><span class="nf">to_i</span> <span class="o">+</span> <span class="s2">"</span><span class="si">#{</span><span class="n">m</span><span class="si">}#{</span><span class="n">o</span><span class="si">}#{</span><span class="n">r</span><span class="si">}#{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">.</span><span class="nf">to_i</span> <span class="o">==</span> <span class="s2">"</span><span class="si">#{</span><span class="n">m</span><span class="si">}#{</span><span class="n">o</span><span class="si">}#{</span><span class="n">n</span><span class="si">}#{</span><span class="n">e</span><span class="si">}#{</span><span class="n">y</span><span class="si">}</span><span class="s2">"</span><span class="p">.</span><span class="nf">to_i</span>
+<span class="n">amb</span> <span class="k">unless</span> <span class="n">constraint</span>
+<span class="nb">puts</span> <span class="s2">"</span><span class="si">#{</span><span class="n">s</span><span class="si">}#{</span><span class="n">e</span><span class="si">}#{</span><span class="n">n</span><span class="si">}#{</span><span class="n">d</span><span class="si">}</span><span class="s2"> + </span><span class="si">#{</span><span class="n">m</span><span class="si">}#{</span><span class="n">o</span><span class="si">}#{</span><span class="n">r</span><span class="si">}#{</span><span class="n">e</span><span class="si">}</span><span class="s2"> = </span><span class="si">#{</span><span class="n">m</span><span class="si">}#{</span><span class="n">o</span><span class="si">}#{</span><span class="n">n</span><span class="si">}#{</span><span class="n">e</span><span class="si">}#{</span><span class="n">y</span><span class="si">}</span><span class="s2">"</span>
+
+</code></pre></div>
+<p>The example above takes a couple of seconds and it&rsquo;s extremely elegant and declarative.</p>
+
+<h2>Problem 2: N-Queens Problem</h2>
+
+<p>The next problem we can solve with amb is harder and more interesting.</p>
+
+<h3>Description</h3>
+
+<p>Given the NxN chessboard, we need to place N queens such that they don&rsquo;t threaten each other. Here&rsquo;s a <a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle">wiki</a> if you want to know more.</p>
+
+<p>Let&rsquo;s think about how we can solve it using amb.</p>
+
+<h3>Notes on implementation</h3>
+
+<ol>
+<li>We need to specify the row and the column of the queen. We can use a simple array for that.</li>
+<li>Rows and columns are unique.</li>
+<li>We need some simple way to check if two queens are on the same diagonal. Quick StackOverflow search suggests that we should check the slope between two queens and if it&rsquo;s the same, they are on the same diagonal, like so:</li>
+</ol>
+<div class="highlight"><pre class="highlight plaintext"><code>(queen1X - queen2X).abs == (quuen1Y - queen2Y).abs
+</code></pre></div>
+<p>That&rsquo;s enough for us to put together a solution</p>
+
+<h3>Implementation</h3>
+
+<p>First, we specify the number of queens and create them</p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="n">n</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">queens</span> <span class="o">=</span> <span class="no">Array</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="p">}</span>
+</code></pre></div>
+<p>We need a unique row, column and diagonal. We could use amb for both row and column, but the result will be super slow and a unique diagonal can be found just by changing column. That&rsquo;s why we hardcode a row and use amb only for a column. </p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="mi">1</span><span class="o">..</span><span class="n">n</span><span class="p">]</span>
+<span class="n">n</span><span class="p">.</span><span class="nf">times</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+  <span class="n">column</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="o">*</span><span class="n">choices</span> <span class="o">-</span> <span class="n">queens</span><span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="n">i</span><span class="p">].</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:first</span><span class="p">))</span>
+  <span class="n">row</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+  <span class="n">queens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">column</span><span class="p">,</span> <span class="n">row</span><span class="p">]</span>
+<span class="k">end</span>
+
+</code></pre></div>
+<p>We check diagonals using the formula for checking slopes</p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="n">different_diags</span> <span class="o">=</span> <span class="n">queens</span><span class="p">.</span><span class="nf">each</span><span class="p">.</span><span class="nf">with_index</span><span class="p">.</span><span class="nf">all?</span> <span class="k">do</span> <span class="o">|</span><span class="n">q1</span><span class="p">,</span> <span class="n">i</span><span class="o">|</span>
+  <span class="p">(</span><span class="n">queens</span><span class="p">[</span><span class="n">i</span><span class="o">..-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">[</span><span class="n">q1</span><span class="p">]).</span><span class="nf">none?</span> <span class="k">do</span> <span class="o">|</span><span class="n">q2</span><span class="o">|</span>
+    <span class="p">(</span><span class="n">q1</span><span class="p">.</span><span class="nf">first</span> <span class="o">-</span> <span class="n">q2</span><span class="p">.</span><span class="nf">first</span><span class="p">).</span><span class="nf">abs</span> <span class="o">==</span> <span class="p">(</span><span class="n">q1</span><span class="p">.</span><span class="nf">last</span> <span class="o">-</span> <span class="n">q2</span><span class="p">.</span><span class="nf">last</span><span class="p">).</span><span class="nf">abs</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>And try again until the constraint is met</p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="n">amb</span> <span class="k">unless</span> <span class="n">different_diags</span>
+</code></pre></div>
+<h4>Full solution</h4>
+<div class="highlight"><pre class="highlight ruby"><code><span class="nb">require</span> <span class="s1">'amb'</span>
+<span class="kp">include</span> <span class="no">Amb</span><span class="o">::</span><span class="no">Operator</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">queens</span> <span class="o">=</span> <span class="no">Array</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="p">}</span>
+<span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="mi">1</span><span class="o">..</span><span class="n">n</span><span class="p">]</span>
+<span class="n">n</span><span class="p">.</span><span class="nf">times</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+  <span class="n">column</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="o">*</span><span class="n">choices</span> <span class="o">-</span> <span class="n">queens</span><span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="n">i</span><span class="p">].</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:first</span><span class="p">))</span>
+  <span class="n">row</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+  <span class="n">queens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">column</span><span class="p">,</span> <span class="n">row</span><span class="p">]</span>
+<span class="k">end</span>
+
+<span class="n">different_diags</span> <span class="o">=</span> <span class="n">queens</span><span class="p">.</span><span class="nf">each</span><span class="p">.</span><span class="nf">with_index</span><span class="p">.</span><span class="nf">all?</span> <span class="k">do</span> <span class="o">|</span><span class="n">q1</span><span class="p">,</span> <span class="n">i</span><span class="o">|</span>
+  <span class="p">(</span><span class="n">queens</span><span class="p">[</span><span class="n">i</span><span class="o">..-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">[</span><span class="n">q1</span><span class="p">]).</span><span class="nf">none?</span> <span class="k">do</span> <span class="o">|</span><span class="n">q2</span><span class="o">|</span>
+    <span class="p">(</span><span class="n">q1</span><span class="p">.</span><span class="nf">first</span> <span class="o">-</span> <span class="n">q2</span><span class="p">.</span><span class="nf">first</span><span class="p">).</span><span class="nf">abs</span> <span class="o">==</span> <span class="p">(</span><span class="n">q1</span><span class="p">.</span><span class="nf">last</span> <span class="o">-</span> <span class="n">q2</span><span class="p">.</span><span class="nf">last</span><span class="p">).</span><span class="nf">abs</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">amb</span> <span class="k">unless</span> <span class="n">different_diags</span>
+<span class="nb">puts</span> <span class="n">queens</span><span class="p">.</span><span class="nf">inspect</span>
+
+</code></pre></div>
+<p>Again, a declarative solution is a few lines long compared to <a href="https://www.rubyguides.com/2018/08/n-queens/"> a procedural one</a></p>
+
+<h2>Problem 3: 4 Color problem</h2>
+
+<p>In our last problem, we&rsquo;ll try to color a map of Europe, using only 4 colors such that no neighborhood countries had the same color.</p>
+
+<p>With amb, the solution is rather straightforward.</p>
+
+<h3>Implementation</h3>
+
+<p>We specify possible colors and countries</p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="nb">require</span> <span class="s1">'amb'</span>
+<span class="kp">include</span> <span class="no">Amb</span><span class="o">::</span><span class="no">Operator</span>
+
+<span class="n">choices</span> <span class="o">=</span> <span class="sx">%i(green yellow red blue)</span>
+
+<span class="n">countries</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="ss">portugal:        </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(spain)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">spain:           </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(portugal andorra france)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">andorra:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(spain france)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">france:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(spain andorra monaco italy switzerland germany luxembourg belgium united_kingdom)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">united_kingdom:  </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france belgium netherlands denmark norway iceland ireland)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">ireland:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(united_kingdom iceland)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">monaco:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">italy:           </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france greece albania montenegro croatia slovenia austria switzerland san_marino)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">san_marino:      </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(italy)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">switzerland:     </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france italy austria germany liechtenstein)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">liechtenstein:   </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(switzerland austria)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">germany:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france switzerland austria czech_republic poland sweden denmark netherlands belgium luxembourg)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">belgium:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france luxembourg germany netherlands)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">netherlands:     </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(belgium germany united_kingdom)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">luxembourg:      </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france germany belgium)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">austria:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(italy slovenia hungary slovakia czech_republic germany switzerland liechtenstein)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">slovenia:        </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(italy croatia hungary austria)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">croatia:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(italy montenegro bosnia serbia hungary slovenia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">bosnia:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(croatia montenegro serbia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">montenegro:      </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(croatia italy albania serbia bosnia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">albania:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(italy greece macedonia serbia montenegro)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">greece:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(italy cyprus bulgaria macedonia albania)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">cyprus:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(greece)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">macedonia:       </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(albania greece bulgaria serbia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">bulgaria:        </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(macedonia greece romania serbia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">serbia:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(montenegro albania macedonia bulgaria romania hungary croatia bosnia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">romania:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(serbia bulgaria hungary moldova)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">hungary:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(slovenia croatia serbia romania slovakia austria ukraine)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">slovakia:        </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(austria hungary poland czech_republic ukraine)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">czech_republic:  </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(germany austria slovakia poland)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">poland:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(germany czech_republic slovakia sweden ukraine lithuania belarus)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">denmark:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(united_kingdom germany sweden norway)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">sweden:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(norway denmark germany poland finland)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">norway:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(united_kingdom denmark sweden finland iceland)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">finland:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(sweden norway)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">iceland:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(ireland united_kingdom norway)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">ukraine:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(slovakia moldova poland belarus hungary)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">moldova:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(ukraine romania)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">belarus:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(poland ukraine lithuania latvia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">lithuania:       </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(poland belarus latvia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">estonia:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(latvia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">latvia:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(estonia belarus lithuania)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>Specify their possible color</p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="n">countries</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">country</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">neighborhood_country_colors</span> <span class="o">=</span> <span class="n">countries</span>
+    <span class="p">.</span><span class="nf">values_at</span><span class="p">(</span><span class="o">*</span><span class="n">value</span><span class="p">[</span><span class="ss">:neighbors</span><span class="p">])</span>
+    <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span> <span class="n">c</span><span class="p">[</span><span class="ss">:color</span><span class="p">]</span> <span class="p">}.</span><span class="nf">compact</span><span class="p">.</span><span class="nf">uniq</span>
+
+  <span class="n">countries</span><span class="p">[</span><span class="n">country</span><span class="p">][</span><span class="ss">:color</span><span class="p">]</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="o">*</span><span class="n">choices</span> <span class="o">-</span> <span class="n">neighborhood_country_colors</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>Check that they are different</p>
+<div class="highlight"><pre class="highlight ruby"><code><span class="n">different_colors</span> <span class="o">=</span> <span class="n">countries</span><span class="p">.</span><span class="nf">none?</span> <span class="k">do</span> <span class="o">|</span><span class="n">country</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">countries</span><span class="p">.</span><span class="nf">values_at</span><span class="p">(</span><span class="o">*</span><span class="n">value</span><span class="p">[</span><span class="ss">:neighbors</span><span class="p">])</span>
+    <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span> <span class="n">c</span><span class="p">[</span><span class="ss">:color</span><span class="p">]</span> <span class="p">}</span>
+    <span class="p">.</span><span class="nf">include?</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="ss">:color</span><span class="p">])</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>Try until the constraint is true
+<code>ruby
+amb unless different_colors
+</code></p>
+
+<h4>Full solution</h4>
+<div class="highlight"><pre class="highlight ruby"><code><span class="nb">require</span> <span class="s1">'amb'</span>
+<span class="kp">include</span> <span class="no">Amb</span><span class="o">::</span><span class="no">Operator</span>
+
+<span class="n">choices</span> <span class="o">=</span> <span class="sx">%i(green yellow red blue)</span>
+
+<span class="n">countries</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="ss">portugal:        </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(spain)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">spain:           </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(portugal andorra france)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">andorra:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(spain france)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">france:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(spain andorra monaco italy switzerland germany luxembourg belgium united_kingdom)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">united_kingdom:  </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france belgium netherlands denmark norway iceland ireland)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">ireland:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(united_kingdom iceland)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">monaco:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">italy:           </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france greece albania montenegro croatia slovenia austria switzerland san_marino)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">san_marino:      </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(italy)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">switzerland:     </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france italy austria germany liechtenstein)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">liechtenstein:   </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(switzerland austria)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">germany:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france switzerland austria czech_republic poland sweden denmark netherlands belgium luxembourg)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">belgium:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france luxembourg germany netherlands)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">netherlands:     </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(belgium germany united_kingdom)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">luxembourg:      </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(france germany belgium)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">austria:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(italy slovenia hungary slovakia czech_republic germany switzerland liechtenstein)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">slovenia:        </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(italy croatia hungary austria)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">croatia:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(italy montenegro bosnia serbia hungary slovenia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">bosnia:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(croatia montenegro serbia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">montenegro:      </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(croatia italy albania serbia bosnia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">albania:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(italy greece macedonia serbia montenegro)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">greece:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(italy cyprus bulgaria macedonia albania)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">cyprus:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(greece)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">macedonia:       </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(albania greece bulgaria serbia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">bulgaria:        </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(macedonia greece romania serbia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">serbia:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(montenegro albania macedonia bulgaria romania hungary croatia bosnia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">romania:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(serbia bulgaria hungary moldova)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">hungary:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(slovenia croatia serbia romania slovakia austria ukraine)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">slovakia:        </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(austria hungary poland czech_republic ukraine)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">czech_republic:  </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(germany austria slovakia poland)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">poland:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(germany czech_republic slovakia sweden ukraine lithuania belarus)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">denmark:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(united_kingdom germany sweden norway)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">sweden:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(norway denmark germany poland finland)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">norway:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(united_kingdom denmark sweden finland iceland)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">finland:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(sweden norway)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">iceland:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(ireland united_kingdom norway)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">ukraine:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(slovakia moldova poland belarus hungary)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">moldova:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(ukraine romania)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">belarus:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(poland ukraine lithuania latvia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">lithuania:       </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(poland belarus latvia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">estonia:         </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(latvia)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+  <span class="ss">latvia:          </span><span class="p">{</span> <span class="ss">neighbors: </span><span class="sx">%i(estonia belarus lithuania)</span><span class="p">,</span> <span class="ss">color: </span><span class="kp">nil</span> <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="n">countries</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">country</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">neighborhood_country_colors</span> <span class="o">=</span> <span class="n">countries</span><span class="p">.</span><span class="nf">values_at</span><span class="p">(</span><span class="o">*</span><span class="n">value</span><span class="p">[</span><span class="ss">:neighbors</span><span class="p">])</span>
+    <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span> <span class="n">c</span><span class="p">[</span><span class="ss">:color</span><span class="p">]</span> <span class="p">}</span>
+    <span class="p">.</span><span class="nf">compact</span>
+    <span class="p">.</span><span class="nf">uniq</span>
+
+  <span class="n">countries</span><span class="p">[</span><span class="n">country</span><span class="p">][</span><span class="ss">:color</span><span class="p">]</span> <span class="o">=</span> <span class="n">amb</span><span class="p">(</span><span class="o">*</span><span class="n">choices</span> <span class="o">-</span> <span class="n">neighborhood_country_colors</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">different_colors</span> <span class="o">=</span> <span class="n">countries</span><span class="p">.</span><span class="nf">none?</span> <span class="k">do</span> <span class="o">|</span><span class="n">country</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">countries</span><span class="p">.</span><span class="nf">values_at</span><span class="p">(</span><span class="o">*</span><span class="n">value</span><span class="p">[</span><span class="ss">:neighbors</span><span class="p">])</span>
+    <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span> <span class="n">c</span><span class="p">[</span><span class="ss">:color</span><span class="p">]</span> <span class="p">}</span>
+    <span class="p">.</span><span class="nf">include?</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="ss">:color</span><span class="p">])</span>
+<span class="k">end</span>
+
+<span class="n">amb</span> <span class="k">unless</span> <span class="n">different_colors</span>
+
+<span class="n">countries</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="o">|</span> <span class="nb">puts</span> <span class="s2">"</span><span class="si">#{</span><span class="n">c</span><span class="si">}</span><span class="s2">: </span><span class="si">#{</span><span class="n">v</span><span class="p">[</span><span class="ss">:color</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
+</code></pre></div>
+<h3>Result</h3>
+
+<p>Here is what we get if we run the code</p>
+<div class="highlight"><pre class="highlight plaintext"><code>portugal: green
+spain: yellow
+andorra: green
+france: red
+united_kingdom: green
+ireland: yellow
+monaco: green
+italy: green
+san_marino: yellow
+switzerland: yellow
+liechtenstein: green
+germany: green
+belgium: yellow
+netherlands: red
+luxembourg: blue
+austria: red
+slovenia: yellow
+croatia: red
+bosnia: green
+montenegro: yellow
+albania: red
+greece: yellow
+cyprus: green
+macedonia: green
+bulgaria: red
+serbia: blue
+romania: yellow
+hungary: green
+slovakia: yellow
+czech_republic: blue
+poland: red
+denmark: yellow
+sweden: blue
+norway: red
+finland: green
+iceland: blue
+ukraine: blue
+moldova: green
+belarus: green
+lithuania: yellow
+estonia: green
+latvia: red
+</code></pre></div>
+<p>I wasn&rsquo;t sure that the code worked correctly so I&rsquo;ve decided to color the map with the colors above. Here is the result</p>
+
+<p><img src="images/color_map.png" alt="4 color map of europe" /></p>
+
+<p>As you can see, all neighborhood countries have different colors.</p>
+
+<h2>Thanks for reading!</h2>
+
+<p>Amb and the puzzles don&rsquo;t really have any pragmatic value, but I feel that in programming there is always room for things that are just fun and magical. Hope you&rsquo;ve enjoyed reading the post.</p>
+
+</div>
+</div>
+<h3 class='mt-5'>Read Next:</h3>
+<a href="breaking-apart-inheritable-mattr_accessors-in-httparty.html"><div class='article rounded'>
+<div class='article-content'>
+<h2>Breaking apart inheritable mattr_accessors in HTTParty</h2>
+</div>
+</div>
+</a>
+</div>
+</div>
+</div>
+</div>
+</body>
+<script async='' src='https://www.googletagmanager.com/gtag/js?id=UA-120732219-2'></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-120732219-2');
+</script>
+</html>

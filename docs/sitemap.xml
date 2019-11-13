@@ -2,13 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://thesmartnik.com/why-on-earth-do-fibers-exist.html</loc>
-    <lastmod>2019-07-04T06:37:13Z</lastmod>
+    <lastmod>2019-10-02T01:41:07Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://thesmartnik.com/breaking-apart-inheritable-mattr_accessors-in-httparty.html</loc>
-    <lastmod>2019-07-24T10:06:15Z</lastmod>
+    <lastmod>2019-09-11T10:35:25Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -31,6 +31,12 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://thesmartnik.com/solving-pazzles-wth-amb.html</loc>
+    <lastmod>2019-11-13T13:09:47Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
     <loc>https://thesmartnik.com/ruby-memory-profiling-in-practice.html</loc>
     <lastmod>2018-08-20T15:02:02Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -44,7 +50,7 @@
   </url>
   <url>
     <loc>https://thesmartnik.com/generating-pdf-with-wickedpdf-in-sidekiq.html</loc>
-    <lastmod>2018-08-19T14:04:10Z</lastmod>
+    <lastmod>2019-07-04T06:37:13Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

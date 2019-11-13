@@ -6,15 +6,19 @@ tags:
 
 ---
 
-Ever since an article about fibers, I was curious about an amb operator. There are multiple articles explaining both what it is and how to implement it: [Roseta Code](http://www.randomhacks.net/2005/10/11/amb-operator/) and [Eric Kidd's blog](http://www.randomhacks.net/2005/10/11/amb-operator/). There is even a [gem with two different implementations](https://github.com/chikamichi/amb). What's left unclear to me for a while was how to solve problems with amb.
+Ever since an article about fibers, I was curious about an amb operator. There are multiple articles explaining both what it is and how to implement it: [Roseta Code](http://www.randomhacks.net/2005/10/11/amb-operator/) and [Eric Kidd's blog](http://www.randomhacks.net/2005/10/11/amb-operator/). There is even a [gem with two different implementations](https://github.com/chikamichi/amb). What's left unclear to me, though was how to solve problems with amb.
 
 I believe that the easiest way to understand something is to build it yourself and then try to explain it to others and that's exactly what I'm doing now :)
 
 Recently, I've solved a few classical problems using amb. The result turned out to be short, simple and declarative.
 
+## Disclaimer
+
+The post turned out to be long, complex and code-heavy, but don't let it discourage you. Please, try some of the things below. Play around it with it. They are mindblowing. A ~~lisp~~ ruby magic at it's finest.
+
 ## What exactly is amb and how it works
 
-I really encourage you to read the articles I've mentioned above. You would better understand how it works under the hood. However, if you decide not to, here is a basic principle:
+I really encourage you to read the articles I've mentioned above. You will better understand how it works under the hood. However, if you decide not to, here is a basic principle:
 > Given a set of constraints and options to choose from, `amb` returns options satisfied by those constraints.
 
 And a basic example:
@@ -30,7 +34,7 @@ amb unless x * y == 8 # constraint
 puts "x: #{x}, y: #{y}"
 => x: 2, y: 4
 ```
-Here we first specify options for `x` and `y`Then we call `amb` without parameter until their product equals 8.
+Here we first specify options for `x` and `y`.Then we call `amb` without parameter until their product equals 8.
 
 Why do we call `amb` without parameter? It's a gem API to try other options by using a ruby control-flow structure called `continuations`. It allows as to easily check possible combinations until we find the one that satisfies the constraints.
 
@@ -46,14 +50,14 @@ Ok, so what amb gives us? Ability to specify a set of constraints and the abilit
 
 ---
 
-## Disclaimer
+## Note
 
 1. In all of the examples, I use gem amb.
-2. Examples don't work in REPL, because irb/pry doesn't handle continuations
+2. Examples don't work in REPL, because irb/pry doesn't handle continuations.
 
 ## Problem 1: SEND + MORE = MONEY
 
-Here is a classical numeric puzzle. We need to change every single letter in the equation `SEND + MORE = MONEY` with a number such that it holds true.
+Here is a classical [cryptarithm](https://en.wikipedia.org/wiki/Verbal_arithmetic). We need to change every single letter in the equation `SEND + MORE = MONEY` with a number such that it holds true.
 
 ### The first naïve solution
 The first thing I tried to do was just declaratively put requirements into code, like so
@@ -81,7 +85,7 @@ It turned out to work but had a serious problem: speed. The code above took 13 *
 
 ### Optimized solution
 
-Here is where [Nikita Shilnikov](https://github.com/flash-gordon) came to the rescue. He showed me, how to specify unique constraints when declaring amb options. This drastically reduced number of combinations we need to check
+Here is where [Nikita Shilnikov](https://github.com/flash-gordon) came to the rescue. He showed, how to specify unique constraints when declaring amb options. This drastically reduced number of combinations we need to check
 
 ```ruby
 require 'amb'
@@ -103,7 +107,7 @@ puts "#{s}#{e}#{n}#{d} + #{m}#{o}#{r}#{e} = #{m}#{o}#{n}#{e}#{y}"
 
 ```
 
-The example above takes a couple of seconds and it's extremely elegant and declarative. You could solve the puzzle using tradition procedural ways and see the difference.
+The example above takes a couple of seconds and it's extremely elegant and declarative.
 
 ## Problem 2: N-Queens Problem
 
@@ -135,9 +139,10 @@ n = 8
 queens = Array.new(n) { [0, 0] }
 ```
 
-Since we need a unique row, column, diagonal and unique diagonal can be found just by changing column, we don't need to use amb for both of them.
+We need a unique row, column and diagonal. We could use amb for both row and column, but the result will be super slow and a unique diagonal can be found just by changing column. That's why we hardcode a row and use amb only for a column. 
 
 ```ruby
+choices = [*1..n]
 n.times do |i|
   column = amb(*choices - queens[0..i].map(&:first))
   row = i + 1
@@ -155,7 +160,7 @@ different_diags = queens.each.with_index.all? do |q1, i|
 end
 ```
 
-And try again if constraint failed
+And try again until the constraint is met
 
 ```ruby
 amb unless different_diags
@@ -169,8 +174,8 @@ require 'amb'
 include Amb::Operator
 
 n = 8
-choices = [*1..n]
 queens = Array.new(n) { [0, 0] }
+choices = [*1..n]
 n.times do |i|
   column = amb(*choices - queens[0..i].map(&:first))
   row = i + 1
@@ -400,3 +405,14 @@ belarus: green
 lithuania: yellow
 estonia: green
 latvia: red
+```
+
+I wasn't sure that the code worked correctly so I've decided to color the map with the colors above. Here is the result
+
+![4 color map of europe](images/color_map.png)
+
+As you can see, all neighborhood countries have different colors.
+
+## Thanks for reading!
+
+Amb and the puzzles don't really have any pragmatic value, but I feel that in programming there is always room for things that are just fun and magical. Hope you've enjoyed reading the post.

@@ -36,8 +36,9 @@ config.social_media_links = {
 ignore 'article.html.haml'
 ignore 'drafts/*'
 
+
 activate :syntax
-set :markdown, tables: true, autolink: true, gh_blockcode: true, fenced_code_blocks: true, smartypants: true
+set :markdown, tables: true, autolink: true, gh_blockcode: true, fenced_code_blocks: true, smartypants: true, strikethrough: true
 set :markdown_engine, :redcarpet
 
 activate :blog do |blog|
